@@ -1,0 +1,267 @@
+#block-body{
+  	width: 810px;
+    margin: 0 auto;
+
+}
+
+#block-header{
+   	width: 800px;
+	height: 85px;
+    border-bottom: 1px solid blue;
+    margin-bottom: 0px;
+	color:#2d4f52;
+    background-color:#83d3ea;
+	border: 1px solid blue;
+}
+#block-header1{
+	 float:left;
+	 width: 600px;
+	 height: 80px;
+}
+#block-header2{
+	 width: 190px;
+	 height: 80px;
+	 padding-right:5px;
+	 float:right;
+}
+
+#left-nav{
+	width: 180px;
+	height: auto;
+	background-color:#83d3ea;
+	margin-top:5px;
+	padding-bottom:5px;
+	float:left;
+}
+
+#left-nav ul{
+	list-style-type: none;
+	margin:0px;
+	padding:0px;
+	font: 14px Arial, sans-serif; 
+}
+#left-nav li{
+	font: bold 17px sans-serif;
+	list-style-type: none;
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left:10px;
+	border-bottom: 1px solid #ededed;
+	
+}
+#left-nav a{
+	font: bold 15px sans-serif;
+	text-decoration:none;
+	list-style-type: none;
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left:10px;
+	
+	color:#24271c;
+}
+#left-nav a:hover{
+	text-decoration:underline;
+}
+
+#block-content {
+	width: 613px;
+	min-height:650px;
+	height:auto;
+	margin-left:185px;
+	border: 1px solid blue;
+	margin-top:5px;
+	
+}
+#block-parameters{
+	height: 40px;
+	border-bottom: 1px solid #ededed;
+	background-color:#F2F2F2;
+}
+
+#title-page{
+	font: 18px sans-serif;
+	margin-top:10px;
+	margin-left:10px;
+	position:absolute;
+}
+#block-info{
+	height: 35px;
+	border-bottom: 1px solid blue;
+}
+
+#count-style{
+	margin-top:7px;
+	font: 15px sans-serif;
+	margin-left:10px;
+	position:absolute;
+	color:#24271c;
+}
+
+#block-obgects {
+	padding: 10px;
+	margin:10px;
+
+	
+}
+.style-title-grid{
+	margin:5px;
+	text-align: center;
+	font: 14px sans-serif;
+}
+.images-grid{
+	padding-top: 0px;
+	height:120px;
+	float: center;
+	text-align:center;
+}
+
+#block-obgects >li{
+	list-style-type: none;
+	border: 1px solid blue;
+	width: 179px;
+	height:230px;
+	margin:5px;
+	float:left;
+}
+
+.pstrnav{
+	margin-top:3px;
+	height:33px;
+	border: 1px solid blue;
+	clear:left;
+	
+}
+.pstrnav ul{
+	margin:0px;
+	padding:0px;
+	margin-left:20px;
+}
+
+.pstrnav li{
+	list-style-type: none;
+	width:20px;
+	height:20px;
+	border: 1px solid #484838;
+	border-radius:3px;
+	background:#e2e1c7;
+	margin-left:5px;
+	float:left;
+	margin-top:3px;
+	padding-top:2px;
+	
+	
+}
+.pstrnav a{
+display:block;
+text-decoration:none;
+padding-left:2px;
+font: bold 12px sans-serif;
+text-align:center;
+padding-top:3px;
+}
+
+.pstrnav p{
+	margin-left:4px;
+	float:left;
+	margin-top:3px;
+	font: bold 12px sans-serif;
+	text-align:center;
+	
+}
+
+.delete {
+	font: bold 14px sans-serif;
+	color:#f52c09ed;
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+.green{
+	font: bold 14px sans-serif;
+	color:green;
+}
+#add-object {
+	margin-top:10px;
+	font: bold 15px sans-serif;
+	margin-left:460px;
+	position:absolute;
+	color:#24271c;
+}
+
+
+#add-object a{
+    padding-left:10px;
+	padding-right:10px;
+	padding-top:3px;
+	padding-bottom:3px;
+	text-decoration:none;
+	text-align:center;
+	background:#ece0dc;
+	font: bold 16px Arial, sans-serif;
+	color:#2d4f52;
+	border: 1px solid #6ba6ab;
+	border-radius:5px;
+}
+
+#edit-object {
+	list-style-type: none;
+}
+
+#edit-object label{
+	position:absolute;
+	font: bold 16px Arial, sans-serif;
+	margin-left:0px;
+	margin-top:5px;
+}
+
+#edit-object li{
+	margin-bottom:10px;
+}
+
+#edit-object select{
+	font: 16px Arial, sans-serif;
+	width:300px;
+	margin-left:180px;
+}
+
+#edit-object input{
+	font: 16px Arial, sans-serif;
+	width:300px;
+	margin-left:180px;
+}
+
+#edit-object p{
+	margin-left:180px;
+}
+#submit-form{
+	margin-right:20px;
+	font: bold 16px Arial, sans-serif;
+	color:#394546;
+	border: 2px solid #394546;
+	border-radius:5px;
+}
+
+#add-input {
+	margin-left:15px;
+	font: bold 15px Arial, sans-serif;
+	cursor:pointer;
+	text-decoration:underline;
+	color:34659D;
+	display:inline-block;
+}
+
+.addimage a{
+	font: bold 13px Arial, sans-serif;
+	color:#D90094;
+	text-decoration:none;
+	cursor:pointer;
+}
+
+.addimage a:hover{
+	text-decoration:underline;
+}
+
+
+
+
+

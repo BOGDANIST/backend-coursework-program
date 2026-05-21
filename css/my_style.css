@@ -1,0 +1,116 @@
+.signup-page {
+  background: none repeat scroll 0 0 #256279;
+  border: 1px solid #63949E;
+  border-radius: 5px;
+  box-shadow: 3 50 20px #050706;
+  color: aliceblue;
+  padding: 30px;
+  font-size: large;
+  
+}
+.signup-page label {
+ 
+  font-size: large;
+  margin-top: 20px;
+}
+.signup-page input{
+  background-color: #a6caef; 
+  color: #ffffff;
+  border:none;
+}
+
+.container {
+  max-width: 1080px;
+  padding: 10px;
+  width: 100%;
+}
+.container.no-padding {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+body{
+
+ background-color: #3ac1ff6f;
+}
+.logo{
+  margin-bottom: 20px;
+}
+
+.signup-page , .block_search{
+	opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 1s;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.dropdown-menu{
+  color: #010203;
+
+}
+
+.dropdown-divider{
+  border: 20px;
+  border-color: #010203;
+}
+
+
+tr,td,th{
+ 
+  border-width: 2px;
+  border-color: #256279;
+  align-items:center;
+  justify-items: center;
+  table-layout: auto;
+ 
+  
+}
+.block_search p{
+  margin-top: 10px;
+  color: #4dc1f3;
+}
+
+#submit-form { 
+  flex-flow: row;
+  background-color: rgb(25, 135, 84);
+  border: 2px solid #c1aaaa; margin-top:25px;
+  color: #e6f2ff;
+  font-size:large;
+  text-align: center;
+  text-justify:center;
+  box-shadow: 3 50 20px #050706;
+height: 3em;
+
+ }
+
+
+
+/* ������ �������� */
+.dropdown-specialty-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #007bff;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* ������, �� ������ */
+.dropdown-specialty-menu {
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ����� �������� */
+.dropdown-specialty-item {
+  padding: 5px 0;
+}
