@@ -10,11 +10,11 @@ const AsyncRouter = {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
 
-            console.log('Applying filters:', filters);
+            //console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
-                this.renderStudentTable(response.data);
+                this.renderStudentTable(response.data, false, page, limit);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
                 ToastNotification.info(response.message);
@@ -27,17 +27,41 @@ const AsyncRouter = {
         }
     },
 
+
+    // async filterOldStudents(formElement = null, page = 1, limit = 50) {
+    //     try {
+    //         const form = formElement || document.getElementById('filter-form');
+    //         const filters = this.collectFilterData(form);
+
+    //         console.log('Applying filters:', filters);
+    //         const response = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
+
+    //         if (response.success) {
+    //             this.renderStudentTable(response.data);
+    //             this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
+    //             this.saveFiltersToLocalStorage(filters);
+    //             ToastNotification.info(response.message);
+    //         } else {
+    //             ToastNotification.error(response.message || 'Помилка при пошуку студентів');
+    //         }
+    //     } catch (error) {
+    //         console.error('Filter error:', error);
+    //         ToastNotification.error('Помилка при пошуку студентів');
+    //     }
+    // },
+
     async filterGroups(formElement = null, page = 1, limit = 50) {
         try {
-            const filters = this.collectFilterData(formElement);
-            filters.page = page;
-            filters.limit = limit;
+            const form = formElement || document.getElementById('filter-form');
+            const filters = this.collectFilterData(form);
 
-            const response = await this.sendRequest('filters/filter_groups.php', 'POST', filters);
-
+            //console.log('Applying filters:', filters);
+            const response = await this.sendRequest('filters/filter_groups.php?page=' + page + '&limit=' + limit, 'POST', filters);
+            //console.log(response);
             if (response.success) {
                 this.renderGroupTable(response.data);
-                this.renderPagination(response.page, response.totalPages, 'filterGroups');
+                this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterGroups');
+                this.saveFiltersToLocalStorage(filters);
                 ToastNotification.info(response.message);
             } else {
                 ToastNotification.error(response.message || 'Помилка при пошуку груп');
@@ -45,6 +69,72 @@ const AsyncRouter = {
         } catch (error) {
             console.error('Filter error:', error);
             ToastNotification.error('Помилка при пошуку груп');
+        }
+    },
+
+    async filterOldStudents(formElement = null, page = 1, limit = 50) {
+        try {
+            const form = formElement || document.getElementById('filter-form');
+            const filters = this.collectFilterData(form);
+
+           // console.log('Applying filters:', filters);
+            const response = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
+
+            if (response.success) {
+                this.renderStudentTable(response.data, true, page, limit);
+                this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterOldStudents');
+                this.saveFiltersToLocalStorage(filters);
+                ToastNotification.info(response.message);
+            } else {
+                ToastNotification.error(response.message || 'Помилка при пошуку студентів');
+            }
+        } catch (error) {
+            console.error('Filter error:', error);
+            ToastNotification.error('Помилка при пошуку студентів');
+        }
+    },
+
+    async filterOldGroups(formElement = null, page = 1, limit = 50) {
+        try {
+            const form = formElement || document.getElementById('filter-form');
+            const filters = this.collectFilterData(form);
+
+           //console.log('Applying filters:', filters);
+            const response = await this.sendRequest('filters/filter_old_groups.php?page=' + page + '&limit=' + limit, 'POST', filters);
+
+            if (response.success) {
+                this.renderGroupTable(response.data, true);
+                this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterOldGroups');
+                this.saveFiltersToLocalStorage(filters);
+                ToastNotification.info(response.message);
+            } else {
+                ToastNotification.error(response.message || 'Помилка при пошуку груп');
+            }
+        } catch (error) {
+            console.error('Filter error:', error);
+            ToastNotification.error('Помилка при пошуку груп');
+        }
+    },
+
+    async filterSpecialties(formElement = null, page = 1, limit = 50) {
+        try {
+            const form = formElement || document.getElementById('filter-form');
+            const filters = this.collectFilterData(form);
+
+            console.log('Applying filters:', filters);
+            const response = await this.sendRequest('filters/filter_specialties.php?page=' + page + '&limit=' + limit, 'POST', filters);
+
+            if (response.success) {
+                this.renderSpecTable(response.data);
+                this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterSpecialties');
+                this.saveFiltersToLocalStorage(filters);
+                ToastNotification.info(response.message);
+            } else {
+                ToastNotification.error(response.message || 'Помилка при пошуку спеціальностей');
+            }
+        } catch (error) {
+            console.error('Filter error:', error);
+            ToastNotification.error('Помилка при пошуку спеціальностей');
         }
     },
 
@@ -76,7 +166,6 @@ const AsyncRouter = {
         try {
             const formData = new FormData(formElement);
             formData.append('id', studentId);
-
             const response = await this.sendRequest('crud/edit_student.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
@@ -169,6 +258,177 @@ const AsyncRouter = {
             if (response.success) {
                 ToastNotification.success('Групу успішно видалено');
                 this.filterGroups();
+            } else {
+                ToastNotification.error(response.message || 'Помилка при видаленні групи');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            ToastNotification.error('Помилка при видаленні групи');
+        }
+    },
+
+    async addSpec(formElement) {
+        try {
+            const formData = new FormData(formElement);
+            const response = await this.sendRequest('crud/add_spec.php', 'POST', Object.fromEntries(formData));
+
+            if (response.success) {
+                ToastNotification.success('Спеціальність успішно додано');
+                formElement.reset();
+                this.filterSpecialties();
+            } else {
+                if (response.errors) {
+                    this.highlightFormErrors(formElement, response.errors);
+                }
+                ToastNotification.error(response.message || 'Помилка при додаванні спеціальності');
+            }
+        } catch (error) {
+            console.error('Add error:', error);
+            ToastNotification.error('Помилка при додаванні спеціальності');
+        }
+    },
+
+    async editSpec(specId, formElement) {
+        try {
+            const formData = new FormData(formElement);
+            formData.append('id', specId);
+
+            const response = await this.sendRequest('crud/edit_spec.php', 'POST', Object.fromEntries(formData));
+
+            if (response.success) {
+                ToastNotification.success('Спеціальність успішно оновлено');
+                this.filterSpecialties();
+            } else {
+                if (response.errors) {
+                    this.highlightFormErrors(formElement, response.errors);
+                }
+                ToastNotification.error(response.message || 'Помилка при оновленні спеціальності');
+            }
+        } catch (error) {
+            console.error('Edit error:', error);
+            ToastNotification.error('Помилка при оновленні спеціальності');
+        }
+    },
+
+    async deleteSpec(specId) {
+        if (!confirm('Ви впевнені що хочете видалити спеціальність?')) {
+            return;
+        }
+
+        try {
+            const response = await this.sendRequest('crud/delete_spec.php', 'POST', { id: specId });
+
+            if (response.success) {
+                ToastNotification.success('Спеціальність успішно видалено');
+                this.filterSpecialties();
+            } else {
+                ToastNotification.error(response.message || 'Помилка при видаленні спеціальності');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            ToastNotification.error('Помилка при видаленні спеціальності');
+        }
+    },
+
+    async addUser(formElement) {
+        try {
+            const formData = new FormData(formElement);
+            const response = await this.sendRequest('crud/add_user.php', 'POST', Object.fromEntries(formData));
+
+            if (response.success) {
+                ToastNotification.success('Користувача успішно додано');
+                formElement.reset();
+                // Load users list if applicable
+                if (window.loadUsersList) window.loadUsersList();
+            } else {
+                if (response.errors) {
+                    this.highlightFormErrors(formElement, response.errors);
+                }
+                ToastNotification.error(response.message || 'Помилка при додаванні користувача');
+            }
+        } catch (error) {
+            console.error('Add error:', error);
+            ToastNotification.error('Помилка при додаванні користувача');
+        }
+    },
+
+    async editUser(userId, formElement) {
+        try {
+            const formData = new FormData(formElement);
+            formData.append('user_id', userId);
+
+            const response = await this.sendRequest('crud/edit_user.php', 'POST', Object.fromEntries(formData));
+
+            if (response.success) {
+                ToastNotification.success('Користувача успішно оновлено');
+                if (window.loadUsersList) window.loadUsersList();
+            } else {
+                if (response.errors) {
+                    this.highlightFormErrors(formElement, response.errors);
+                }
+                ToastNotification.error(response.message || 'Помилка при оновленні користувача');
+            }
+        } catch (error) {
+            console.error('Edit error:', error);
+            ToastNotification.error('Помилка при оновленні користувача');
+        }
+    },
+
+    async deleteUser(userId) {
+        if (!confirm('Ви впевнені що хочете видалити користувача?')) {
+            return;
+        }
+
+        try {
+            const response = await this.sendRequest('crud/delete_user.php', 'POST', { user_id: userId });
+
+            if (response.success) {
+                ToastNotification.success('Користувача успішно видалено');
+                if (window.loadUsersList) window.loadUsersList();
+            } else {
+                ToastNotification.error(response.message || 'Помилка при видаленні користувача');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            ToastNotification.error('Помилка при видаленні користувача');
+        }
+    },
+
+    async deleteOldStudent(studentId) {
+        if (!confirm('Ви впевнені що хочете видалити студента?')) {
+            return;
+        }
+
+        try {
+            const response = await this.sendRequest('crud/delete_old_student.php', 'POST', { id: studentId });
+
+            if (response.success) {
+                ToastNotification.success('Студента успішно видалено');
+                if (window.location.pathname.includes('view_old_student.php')) {
+                    window.history.back();
+                }
+            } else {
+                ToastNotification.error(response.message || 'Помилка при видаленні студента');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            ToastNotification.error('Помилка при видаленні студента');
+        }
+    },
+
+    async deleteOldGroup(groupId) {
+        if (!confirm('Ви впевнені що хочете видалити групу?')) {
+            return;
+        }
+
+        try {
+            const response = await this.sendRequest('crud/delete_old_group.php', 'POST', { id: groupId });
+
+            if (response.success) {
+                ToastNotification.success('Групу успішно видалено');
+                if (window.location.pathname.includes('view_old_group.php')) {
+                    window.history.back();
+                }
             } else {
                 ToastNotification.error(response.message || 'Помилка при видаленні групи');
             }
@@ -314,7 +574,9 @@ const AsyncRouter = {
         });
     },
 
-    renderStudentTable(students) {
+    renderStudentTable(students, oldFormat = false, page = 1, limit = 50) {
+        console.log(page, limit);
+       // console.log('Rendering students:', students, 'Old format:', oldFormat);
         const container = document.getElementById('results-table');
         if (!container) return;
 
@@ -337,19 +599,31 @@ const AsyncRouter = {
         students.forEach((student, index) => {
             html += `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td>${index + 1 + (page - 1) * limit}</td>
                     <td>${this.escapeHtml(student.s_pr)}</td>
                     <td>${this.escapeHtml(student.s_im)}</td>
                     <td>${this.escapeHtml(student.s_bat)}</td>
                     <td>${this.escapeHtml(student.s_group)}</td>
                     <td>${this.escapeHtml(student.s_cours)}</td>
+                    `;
+                    if (oldFormat) {
+                         html +=`
+                        <td>
+                            <a href="view_old_student.php?id_st=${student.s_id}">Перегляд</a>
+                        </td>
+                                        </tr>`;
+                    } else {
+                            html +=`
                     <td>
                         <a href="view_student.php?id_st=${student.s_id}">Перегляд</a>
                         <a href="edit_student.php?id_st=${student.s_id}">Змінити</a>
                         <a href="#" onclick="AsyncRouter.deleteStudent(${student.s_id}); return false;">Видалити</a>
                     </td>
-                </tr>
-            `;
+                                    </tr>
+                        `;
+                        }
+
+
         });
 
         html += `
@@ -360,7 +634,8 @@ const AsyncRouter = {
         container.innerHTML = html;
     },
 
-    renderGroupTable(groups) {
+    renderGroupTable(groups, oldFormat = false) {
+        console.log('Rendering groups:', groups, 'Old format:', oldFormat);
         const container = document.getElementById('results-table');
         if (!container) return;
 
@@ -378,15 +653,62 @@ const AsyncRouter = {
         `;
 
         groups.forEach((group, index) => {
+            if (oldFormat) {
+                const viewLink = group.g_id ? `view_old_group.php?id_group=${group.g_id}` : `view_old_group.php?id_group=${group.g_id}`;
+            } else {
+                // Support both new and old group formats
+                const viewLink = group.g_id ? `view_group.php?id_group=${group.g_id}` : `view_old_group.php?id_group=${group.g_id}`;
+                const editLink = group.g_id ? `edit_group.php?id_group=${group.g_id}` : `edit_old_group.php?id_group=${group.g_id}`;
+            }
             html += `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${this.escapeHtml(group.g_im)}</td>
                     <td>${this.escapeHtml(group.g_course)}</td>
                     <td>
-                        <a href="view_group.php?id_group=${group.g_id}">Перегляд</a>
-                        <a href="edit_group.php?id_group=${group.g_id}">Змінити</a>
+                        <a href="${viewLink}">Перегляд</a>
+                        <a href="${editLink}">Змінити</a>
                         <a href="#" onclick="AsyncRouter.deleteGroup(${group.g_id}); return false;">Видалити</a>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        `;
+
+        container.innerHTML = html;
+    },
+
+    renderSpecTable(specs) {
+        const container = document.getElementById('results-table');
+        if (!container) return;
+
+        let html = `
+            <table class="table table-primary rounded-1 table-striped table-responsive-md">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Галузь</th>
+                        <th>Спеціальність</th>
+                        <th>Спеціалізація</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        specs.forEach((spec, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${this.escapeHtml(spec.im_galuz || '')}</td>
+                    <td>${this.escapeHtml(spec.im_spec)}</td>
+                    <td>${this.escapeHtml(spec.im_specializ || '')}</td>
+                    <td>
+                        <a href="#" onclick="AsyncRouter.deleteSpec(${spec.id_sp}); return false;">Видалити</a>
                     </td>
                 </tr>
             `;
@@ -468,7 +790,7 @@ const AsyncRouter = {
 };
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Load saved filters if on filter page
     const filterForm = document.getElementById('filter-form');
     if (filterForm) {

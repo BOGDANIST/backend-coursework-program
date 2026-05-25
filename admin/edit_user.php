@@ -74,6 +74,8 @@ else
         <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
         <!-- Template CSS -->
 <link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
+		<!-- Toast Notifications CSS -->
+		<link rel="stylesheet" href="assets/css/toast-notifications.css">
         <!-- Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
     
@@ -140,7 +142,7 @@ else
 									<option value="admin">Адміністратор</option>
 									</select>  
 								<p>
-								 <input type="submit" class="form-control" id="submit-form" name="submit_new_password" value="Підтвердити" >
+								 <button type="button" class="form-control bg-success" id="submit-form" onclick="AsyncRouter.editUser(<?= isset($id_user) ? $id_user : 0 ?>, this.form.closest('form')); return false;">Підтвердити</button>
 								</p>
 							</form>
 						</div>
@@ -148,12 +150,19 @@ else
 				  </div>
 			    </div>
             </div>
-			    <!-- Footer -->        
+			    <!-- Footer -->
 
         </div>
-		
+
+		<!-- Toast Notifications Container -->
+		<div id="toast-container"></div>
+
 			 	<?php include ("../include/footer.php");?>
 
+		<!-- Toast Notifications -->
+		<script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+		<!-- Async Router -->
+		<script type="text/javascript" src="async.js" type="text/javascript"></script>
 		</body>
           
 

@@ -1,92 +1,23 @@
 <?php
-
 session_start();
- 
-	if (!in_array($_SESSION['auth_user'], ['admin']))
-	{   
-		header("Location: admin_panel.php");
-	}   
-else
-	{
-	 include ("../include/db_connect.php");
-	 error_reporting(0);
-	}
+
+if (!in_array($_SESSION['auth_user'], ['admin'])) {
+    header("Location: admin_panel.php");
+}
+else {
+    include("../include/db_connect.php");
+    error_reporting(0);
+}
 ?>
-
-
-
-
-<?php
-	
-	if (isset($_POST['submit_reg']))
-    {
-		if ($_POST["input_login"]=="" || $_POST["input_password1"]=="" || $_POST["input_password1"]=="")
-			{'
-				<script>
-				alert("Не введено логін або пароль.");
-				</script>';
-				$error="Не введено логін або пароль";
-			}
-		
-		if ($_POST["input_password1"]!=$_POST["input_password2"])
-		    {'
-			<script>
-			alert("Не співпадають введені значення паролю.");
-			</script>';
-			$error="Не співпадають введені значення паролю";
-		    }
-		
-		$result=mysqli_query($linc, "SELECT * FROM users");
-           $row = mysqli_fetch_array($result);
-			do{
-			  if ($_POST["input_login"]==$row['login'])
-			  {'
-				<script>
-					alert("Такий логін вже існує.");
-				</script>';
-				$error="Такий логін вже існує";				
-			  }
-			  
-			 
-			  if (md5($_POST["input_password1"])==$row['password'])
-			    {'
-				<script>
-					alert("Такий пароль вже існує.");
-				</script>';	
-			    $error="Такий пароль вже існує";
-
-				}
-		      }	
-			while ($row = mysqli_fetch_array($result));  	
-		
-		if ($error=="")
-		{
-			$password =	md5($_POST["input_password1"]);
-			if ($_POST["input_status"]=="user") $status="1";
-			if ($_POST["input_status"]=="admin") $status="10";
-			if ($_POST["input_status"]=="editor") $status="9";
-			if ($_POST["input_status"]=="viewer") $status="8";
-			mysqli_query($linc, "INSERT INTO users SET
-					login='".$_POST["input_login"]."',
-					password='".$password."',
-					status='".$status."'
-					");
-			$success = "Користувач успішно зареєстрований";
-		};
-	};		
-
-?>
-
 
 <!-- === BEGIN HEADER === -->
-
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
 <!--[if !IE]><!-->
 <html lang="en">
-   
+
    <!--<![endif]-->
     <head>
         <!-- Title -->
@@ -105,19 +36,19 @@ else
         <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
         <!-- Template CSS -->
 		<link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
-
-        
+		<!-- Toast Notifications CSS -->
+		<link rel="stylesheet" href="assets/css/toast-notifications.css">
 
         <!-- Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-    
+
 	<style>
   .fakeimg {
       height: 200px;
       background: #aaa;
 			}
 	</style>
-	
+
 	</head>
     <body>
       <div id="body-bg">
@@ -139,96 +70,99 @@ else
                 </div>
             </div>
             <!-- End Header -->
-			
+
 			<!-- Admin Menu -->
 			<?php include ("../include/adm_menu.php");?>
 			 <?php include ("../include/background_icon.php");?>
             <!-- End Admin Menu -->
-           
+
             <!-- === END HEADER === -->
-         
 
 
 		   <!-- === BEGIN CONTENT === -->
-	        <div class="container bottom-border">
-                    
-            <!-- End Portfolio -->
-			
-            <!-- === END CONTENT === -->
-            <!-- === BEGIN FOOTER === -->
+			<div class="container bottom-border">
 				<div id="base">
 					<div id="content">
+						<div class="row padding-top-40">
+							<div class="col-md-12">
+								<div class="col-md-12" style="margin-top:10px;">
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="user-add">
+											<div class="container background-white" style="margin:0px; padding:10px;">
+												<div class="row margin-vert-30" style="margin:0px; padding:0px;">
+													<!-- Register Box -->
+													<div class="col-md-6 col-md-offset-3 col-sm-offset-3 ">
 
+														<form id="add-user-form" class="signup-page fs-3 shadow-lg" novalidate>
+															<div class="signup-header">
+																<h2 style="color:#e1eefb;"><center><strong>Реєстрація нового користувача</strong></center></h2>
+															</div>
 
-					<?php if (!empty($error)): ?>
-					<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-					<div id="errorToast" class="toast align-items-center text-bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-						<div class="d-flex">
-						<div class="toast-body fs-3">
-							<?= htmlspecialchars($error) ?>
-						</div>
-						<button type="button" class="btn-close btn-close-white me-2 m-auto " data-bs-dismiss="toast" aria-label="Закрити"></button>
-						</div>
-					</div>
-					</div>
-					<?php endif; ?>
+															<label for="sel1">Введіть логін</label>
+															<input type="text" class="form-control" id="sel1" name="input_login" style="background:white; color:#0c0e0c; border:none;" required>
 
-					<?php if (!empty($success)): ?>
-					<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-					<div id="errorToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-						<div class="d-flex">
-						<div class="toast-body fs-3">
-							<?= htmlspecialchars($success) ?>
-						</div>
-						<button type="button" class="btn-close btn-close-white me-2 m-auto " data-bs-dismiss="toast" aria-label="Закрити"></button>
-						</div>
-					</div>
-					</div>
-					<?php endif; ?>
+															<label>Введіть пароль</label>
+															<input type="password" class="form-control" id="sel2" name="input_password1" style="background:white; color:#0c0e0c; border:none;" required>
 
+															<label>Підтвердить пароль</label>
+															<input type="password" class="form-control" id="sel3" name="input_password2" style="background:white; color:#0c0e0c; border:none;" required>
 
-					  <div class="container background-white" style="margin:0px; padding:10px;">
-						<div class="row margin-vert-30" style="margin:0px; padding:0px;">
-							<!-- Register Box -->
-							<div class="col-md-6 col-md-offset-3 col-sm-offset-3 ">
-								
-								<form class="signup-page  fs-3  shadow-lg" method="POST">
-									<div class="signup-header">
-										<h2 style="color:#e1eefb;"><center><strong>Реєстрація нового користувача</strong></center></h2>
+															<label>Виберіть рівень доступу</label>
+															<select class="form-control" name="input_status" id="sel5" size="3" style="background:white; color:#0c0e0c;" required>
+																<option value="admin">Адміністратор</option>
+																<option value="editor">Редактор</option>
+																<option value="viewer">Спостерігач</option>
+															</select>
+
+															<p>
+																<button type="button" class="form-control bg-success shadow" id="submit-form" onclick="AsyncRouter.addUser(this.form.closest('form')); return false;">
+																	Реєстрація
+																</button>
+															</p>
+														</form>
+
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
-									
-									<label for="sel1">Введіть логін</label>
-									<input type="text" class="form-control" id="sel1"  name="input_login" style="background:white; color:#0c0e0c; border:none;"  >
-									
-									<label >Введіть пароль</label>
-									<input type="password" class="form-control" id="sel2"  name="input_password1" style="background:white; color:#0c0e0c; border:none;"  > 
-									
-									<label >Підтвердить пароль</label>
-									<input type="password" class="form-control" id="sel3"  name="input_password2" style="background:white; color:#0c0e0c; border:none;"  > 
-									
-									<label >Виберіть рівень доступу</label>
-									<select class="form-control"  name="input_status" id="sel5" size="3" style="background:white; color:#0c0e0c;">
-									<!-- <option value="user">Користувач</option> -->
-									<option value="admin">Адміністратор</option>
-									<option value="editor">Редактор</option>
-									<option value="viewer">Спостерігач</option>
-								    </select>  
-									
-									<p>
-									 <input type="submit" class="form-control bg-success shadow" id="submit-form" name="submit_reg" value="Реєстрація" >
-									</p>
-								</form>
-							
+								</div>
 							</div>
 						</div>
-					  </div>
 					</div>
 				</div>
 			</div>
-						    <!-- Footer -->        
+			<!-- === END CONTENT === -->
+
+	<!-- Toast Notifications Container -->
+	<div id="toast-container"></div>
+
+			  <!-- Footer -->
+    <!-- Footer -->
  	<?php include ("../include/footer.php");?>
 
+            <!-- End Footer -->
+            <!-- JS -->
+            <script type="text/javascript" src="assets/js/jquery.min.js" type="text/javascript"></script>
+            <script type="text/javascript" src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+            <script type="text/javascript" src="assets/js/scripts.js"></script>
+            <!-- Isotope - Portfolio Sorting -->
+            <script type="text/javascript" src="assets/js/jquery.isotope.js" type="text/javascript"></script>
+            <!-- Mobile Menu - Slicknav -->
+            <script type="text/javascript" src="assets/js/jquery.slicknav.js" type="text/javascript"></script>
+            <!-- Animate on Scroll-->
+            <script type="text/javascript" src="assets/js/jquery.visible.js" charset="utf-8"></script>
+            <!-- Sticky Div -->
+            <script type="text/javascript" src="assets/js/jquery.sticky.js" charset="utf-8"></script>
+            <!-- Slimbox2-->
+            <script type="text/javascript" src="assets/js/slimbox2.js" charset="utf-8"></script>
+            <!-- Modernizr -->
+            <script src="assets/js/modernizr.custom.js" type="text/javascript"></script>
+            <!-- Toast Notifications -->
+            <script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+            <!-- Async Router -->
+            <script type="text/javascript" src="async.js" type="text/javascript"></script>
+            <!-- End JS -->
+	</body>
 
-		 
-  </body>
 </html>

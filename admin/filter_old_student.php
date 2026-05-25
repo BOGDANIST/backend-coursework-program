@@ -11,80 +11,39 @@ else
 	error_reporting(0);
 		
 	
-	    // Якщо користувач натиснув кнопку "Очистити", видаляємо фільтри в сесії 
-    if (isset($_POST['clear_search'])) {
-        $_SESSION['filters'] = [];
-        $_SESSION['query_all'] = "1=1";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit;
-    }
+    // Серверсайдне збереження фільтрів видалено — фільтрація робиться через AJAX
 
-    // Якщо дані надійшли методом POST, повністю замінюємо дані фільтрів у сесії
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['clear_search'])) {
-        $_SESSION['filters'] = $_POST;
-    }
+    // Ініціалізація змінних (за замовчуванням порожні). Фільтри обробляються на клієнті/через AJAX.
+    $filter_operation = '';
+    $text_yer = '';
+    $check_mp1 = $check_mp2 = $check_men = $check_women = '';
+    $vik_from = $vik_to = '';
 
-    // Ініціалізація змінних із сесії
-    $filters = $_SESSION['filters'] ?? [];
-
-	$filter_operation     = $filters['filter_operation'] ?? '';
-    $text_yer     = $filters['text_yer'] ?? '';
-    $check_mp1    = isset($filters['check_mp1']) ? 'checked' : '';
-    $check_mp2    = isset($filters['check_mp2']) ? 'checked' : '';
-    $check_men    = isset($filters['check_men']) ? 'checked' : '';
-    $check_women  = isset($filters['check_women']) ? 'checked' : '';
-
-    $vik_from     = $filters['vik_from'] ?? '';
-    $vik_to       = $filters['vik_to'] ?? '';
-
-    $check_os1    = isset($filters['check_os1']) ? 'checked' : '';
-    $check_os2    = isset($filters['check_os2']) ? 'checked' : '';
-    $check_os3    = isset($filters['check_os3']) ? 'checked' : '';
-    $check_os4    = isset($filters['check_os4']) ? 'checked' : '';
-
-    $check_sirot   = isset($filters['check_sirot']) ? 'checked' : '';
-    $check_peres   = isset($filters['check_peres']) ? 'checked' : '';
-    $check_chernob = isset($filters['check_chernob']) ? 'checked' : '';
-    $check_ivalid  = isset($filters['check_ivalid']) ? 'checked' : '';
-    $check_malozab = isset($filters['check_malozab']) ? 'checked' : '';
-    $check_ato     = isset($filters['check_ato']) ? 'checked' : '';
-    $check_uchbd   = isset($filters['check_uchbd']) ? 'checked' : '';
-    $check_ditzag  = isset($filters['check_ditzag']) ? 'checked' : '';
-    $check_stepver = isset($filters['check_stepver']) ? 'checked' : '';
-    $check_shaht   = isset($filters['check_shaht']) ? 'checked' : '';
+    $check_os1 = $check_os2 = $check_os3 = $check_os4 = '';
+    $check_sirot = $check_peres = $check_chernob = $check_ivalid = $check_malozab = $check_ato = $check_uchbd = $check_ditzag = $check_stepver = $check_shaht = '';
 
     // Галузь знань
-    $check_gz0 = isset($filters['check_gz0']) ? 'checked' : '';
-    $check_gz1 = isset($filters['check_gz1']) ? 'checked' : '';
-    $check_gz2 = isset($filters['check_gz2']) ? 'checked' : '';
-    $check_gz3 = isset($filters['check_gz3']) ? 'checked' : '';
-    $check_gz4 = isset($filters['check_gz4']) ? 'checked' : '';
-    $check_gz5 = isset($filters['check_gz5']) ? 'checked' : '';
+    $check_gz0 = $check_gz1 = $check_gz2 = $check_gz3 = $check_gz4 = $check_gz5 = '';
 
     // Спеціальність
-    $spec = isset($filters['spec']) ? 'checked' : '';
+    $spec = '';
 
     // Курс
-    $check_kurs1 = isset($filters['check_kurs1']) ? 'checked' : '';
-    $check_kurs2 = isset($filters['check_kurs2']) ? 'checked' : '';
-    $check_kurs3 = isset($filters['check_kurs3']) ? 'checked' : '';
-    $check_kurs4 = isset($filters['check_kurs4']) ? 'checked' : '';
+    $check_kurs1 = $check_kurs2 = $check_kurs3 = $check_kurs4 = '';
 
-    $form_group  = $filters['form_group'] ?? '';
-    $check_vg    = isset($filters['check_vg']) ? 'checked' : '';
+    $form_group = '';
+    $check_vg = '';
 
-    $check_vz0   = isset($filters['check_vz0']) ? 'checked' : '';
-    $check_vz1   = isset($filters['check_vz1']) ? 'checked' : '';
+    $check_vz0 = $check_vz1 = '';
+    $select_region = '';
 
-    $select_region = $filters['select_region'] ?? '';
-
-	$limit = isset($_GET['limit']) && in_array((int)$_GET['limit'], [10, 25, 50, 100]) ? (int)$_GET['limit'] : 50;
+    $limit = isset($_GET['limit']) && in_array((int)$_GET['limit'], [10, 25, 50, 100]) ? (int)$_GET['limit'] : 50;
 
     // Для сортування
-    $sort_by = $filters['sort_by'] ?? ($_REQUEST['sort_by'] ?? '');
-    $sort_dir = strtoupper($filters['sort_dir'] ?? ($_REQUEST['sort_dir'] ?? 'ASC'));
+    $sort_by = $_REQUEST['sort_by'] ?? '';
+    $sort_dir = strtoupper($_REQUEST['sort_dir'] ?? 'ASC');
 
-	// Тепер ці змінні можна використовувати для підготовки форми та подальшої логіки
+    // Тепер ці змінні можна використовувати для підготовки форми та подальшої логіки
 
 
 
@@ -136,23 +95,10 @@ else
         <!-- Bootstrap Core CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
-		
+        <link rel="stylesheet" href="../assets/css/bootstrap.css">
+        
         <!-- Template CSS -->
-		<link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
-        <!-- Google Fonts-->
-        <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-        <!-- Google Fonts-->
-        <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-    
-    </head>
-   
-    <div id="body-bg">
-       <!-- Phone/Email -->
-
-            <!-- End Phone/Email -->
-            <!-- Header -->
-            <div id="header">
+		<link rel="stylesheet" href="../css/my_style.css">
                 <div class="container">
                     <div class="row">
                         <!-- Logo -->
@@ -212,7 +158,7 @@ else
 
 
 				
-				<form method="POST" action="">
+				<form id="filter-form" method="POST" style="display: contents;">
 			       
 					<!-- Секція сортування -->
 					<div id="block-search-sort" class="mb-3 fs-3">
@@ -504,7 +450,7 @@ else
 
 		<div  style=" border-top:2px solid #cccccc; margin-bottom:0px; margin-top: 10px;">
                         <input class="col-4 form-control bg-success fs-3" type="submit" name="submit_search" id="submit-filter" value="Пошук" style="margin-top:10px; border-radius:5px;color: #ddfff0;"/>
-						<button  class="form-control bg-danger fs-3" type="submit" name="clear_search" style="margin-top:10px; border-radius:5px; color: #ffffff;">
+						<button  class="form-control bg-danger fs-3" type="button" id="clear-filter" name="clear_search" style="margin-top:10px; border-radius:5px; color: #ffffff;">
 						Очистити
 						</button>					   
 						<button class="col-6 form-control fs-3" type="submit" name="download_excel" value="yes" formaction="test\search_excel.php" style="background-color: #d9d368; margin-top:10px; border-radius:5px; color: #000000;">Завантажити Excel</button>
@@ -519,441 +465,26 @@ else
 			<div class="row">
                  <div class="col-md-12" style="margin-top:10px;">
                      <div class="tab-content ">
+                         <div id="results-table" class="table-responsive"></div>
                         <div class="tab-pane active in fade" id="faq">
                             <div class="panel-group" id="accordion">
                                                
 												
-	<?php  
 	
-	//Формування запиту
-	if($_POST["submit_search"])
-	{ $query_all='';
-		
-		//Вид замовлення
-		$vz='';
-						$check_vz0=$_POST ["check_vz0"];
-				 		$check_vz1=$_POST ["check_vz1"];
-						
-						if($check_vz0!="")
-							{$query_vz0="'".$check_vz0."'";
-							 $vz=",";
-							 }
-						
-						if($check_vz1!="")$query_vz1=$vz."'".$check_vz1."'";
-
-						if($check_vz0=="" and  $check_vz1=="")
-						{$query_vz="s_contract IN('Так','Ні','')";}
-				         else {$query_vz="s_contract IN(".$query_vz0.$query_vz1.")";
-						 }				 
-		
-		//Галузь знань
-		$gz='';
-		$selectedGz = isset($_POST['check_gz']) ? $_POST['check_gz'] : array();
-
-		// Якщо нічого не вибрано – витягуємо всі унікальні значення із бази
-		if (empty($selectedGz)) {
-			$allGz = array();
-			$gz_query_all = "SELECT DISTINCT s_galuz AS gz FROM old_student ORDER BY s_galuz ASC";
-			$result_all = mysqli_query($linc, $gz_query_all);
-			if ($result_all) {
-				while ($row = mysqli_fetch_assoc($result_all)) {
-					$allGz[] = $row['gz'];
-				}
-			}
-			$selectedGz = $allGz;
-		}
-
-		// Екрануємо значення та формуємо список для SQL‑умови
-		$escapedGz = array();
-		foreach ($selectedGz as $gz) {
-			$escapedGz[] = "'" . mysqli_real_escape_string($linc, $gz) . "'";
-		}
-
-		// Фінальна SQL умова для галузей знань
-		$query_gz = " AND s_galuz IN(" . implode(',', $escapedGz) . ")";
-		//echo $query_gz;
-
-
-		
-		///////Спеціальність
-		$sp='';
-		$selected_specs = isset($_POST['check_sp']) ? $_POST['check_sp'] : array();
-
-		// Якщо нічого не вибрано, беремо всі спеціальності з бази
-		if (empty($selected_specs)) {
-			$all_specs = array();
-			$spec_query = "SELECT DISTINCT CONCAT( im_spec) AS spec FROM spec ORDER BY id_spec ASC";
-			$spec_result = mysqli_query($linc, $spec_query);
-			if ($spec_result) {
-				while ($row = mysqli_fetch_assoc($spec_result)) {
-					$all_specs[] = $row['spec'];
-				}
-			}
-			// Тепер якщо нічого не вибрано, беремо умовно всі спеціальності як вибрані
-			$selected_specs = $all_specs;
-		}
-
-		// Екрануємо значення та формуємо рядок для SQL IN(...)
-		$escaped_specs = array();
-		foreach ($selected_specs as $spec) {
-			$escaped_specs[] = "'" . mysqli_real_escape_string($linc, $spec) . "'";
-		}
-
-		// Формуємо фінальний рядок для додавання до SQL-запиту
-		$query_sp = " AND s_spec IN(" . implode(',', $escaped_specs) . ")";
-
-		// Для перевірки можна вивести $query_sp, наприклад:
-		//echo $sp;
-
-
-
-		//Курс
-		$sk='';
-						$check_sk1=$_POST ["check_kurs1"];
-						$check_sk2=$_POST ["check_kurs2"];
-						$check_sk3=$_POST ["check_kurs3"];
-						$check_sk4=$_POST ["check_kurs4"];
-						if($check_sk1=="1")
-							{$query_sk1="'".$check_sk1."'";
-							 $sk=',';}
-						if($check_sk2=="2")
-							{$query_sk2=$sk."'".$check_sk2."'";
-							 $sk=",";}
-						if($check_sk3=="3")
-							{$query_sk3=$sk."'".$check_sk3."'";
-						     $sk=",";}
-						if($check_sk4=="4") $query_sk4=$sk."'".$check_sk4."'";
-						if($check_sk1=="" and  $check_sk2=="" and  $check_sk3=="" and  $check_sk4=="")
-						{$query_sk=" AND s_cours IN('1','2','3','4')";}
-						else $query_sk=" AND s_cours IN(".$query_sk1.$query_sk2.$query_sk3.$query_sk4.")";
-						
-		//Випускна група
-					
-						$check_vg=$_POST ["check_vg"];
-						if($check_vg=="Так") $query_vg=" AND s_vip IN('Так')";
-						else $query_vg=" AND s_vip IN('Так','Ні','')";
-							 
-		//Стать
-		$st='';
-						$check_men=$_POST ["check_men"];
-				 		$check_women=$_POST ["check_women"];
-						
-						if($check_men=="Чоловік")
-							{$query_st0="'".$check_men."'";
-							 $st=",";
-							 }
-						
-						if($check_women=="Жінка")$query_st1=$st."'".$check_women."'";
-
-						if($check_men=="" and  $check_women=="")
-						{$query_st=" AND s_stat IN('Чоловік','Жінка')";}
-				         else {$query_st=" AND s_stat IN(".$query_st0.$query_st1.")";
-						 }			
-	
-		//Освіта
-		$os='';
-						//echo $check_os1=$_POST ["check_os1"];
-				 		//echo $check_os2=$_POST ["check_os2"];
-						 $check_os1 = isset($_POST["check_os1"]) ? $_POST["check_os1"] : "";
-						$check_os2 = isset($_POST["check_os2"]) ? $_POST["check_os2"] : "";
-						$check_os3 = isset($_POST["check_os3"]) ? $_POST["check_os3"] : "";
-						 $check_os4 = isset($_POST["check_os4"]) ? $_POST["check_os4"] : "";
-
-						$query_os1 = "";
-						$query_os2 = "";
-						$query_os3 = "";
-						$query_os4 = "";
-
-						if ($check_os1 == "Базова загальна середня освіта") {
-							$query_os1 = "'".$check_os1."','Базова середня освіта'";
-						}
-
-						if ($check_os2 == "Повна загальна середня освіта") {
-							$query_os2 = ($query_os1 ? "," : "") . "'".$check_os2."','Повна середня освіта'";
-						}
-
-						if ($check_os3 == "Молодший спеціаліст") {
-							$query_os3 = "'".$check_os3."'";
-						}
-						if ($check_os4 == "Кваліфікований робітник") {
-							$query_os4 = "'".$check_os4."'";
-						}
-						if (empty($check_os1) && empty($check_os2)&& empty($check_os3)&& empty($check_os4)) {
-							$query_os = "";
-							//$query_os = " AND s_osvita_type IN('Базова загальна середня освіта','Повна загальна середня освіта','Базова середня освіта','Повна середня освіта')";
-						} else {
-							$query_os = " AND s_osvita_type IN(".$query_os1.$query_os2.$query_os3.$query_os4.")";
-						}
-		
-		//Вік
-					
-					//	echo $text_vik=$_POST ["text_vik"];
-						if($text_vik!="") 
-						{$query_vik0="'".$text_vik."'";
-						$query_vik=" AND s_vik IN(".$query_vik0.")";
-						}
-						else $query_vik="";
-						
-		//Рік завершення школи
-				
-					//	echo $text_yer=$_POST ["text_yer"];
-						if($text_yer!="") 
-						{$text_yer0="'".$text_yer."'";
-						$query_yer=" AND s_rik_zaver IN(".$text_yer.")";
-						}
-						else $query_yer="";
-		
-		//Місце проживання
-				$mp='';
-						$check_mp1=$_POST ["check_mp1"];
-				 		$check_mp2=$_POST ["check_mp2"];
-						
-						if($check_mp1=="Місто")
-							{$query_mp1="'".$check_mp1."'";
-							 $mp=",";
-							 }
-						
-						if($check_mp2=="Сільська місцевість") {$query_mp2=$mp."'".$check_mp2."' ,'Село'";}
-
-						if($check_mp1=="" and  $check_mp2=="")
-						{$query_mp=" AND s_region_type IN('Місто','Сільська місцевість','Село')";}
-				         else {
-							 $query_mp=" AND s_region_type IN(".$query_mp1.$query_mp2.")";
-						 }	
-
-						if (!empty($select_region)) {
-							$query_region = " AND s_region = '" . mysqli_real_escape_string($linc, $select_region) . "'";
-						} else {
-							$query_region = ""; // якщо область не вибрана — не фільтруємо
-						}
-		
-						// Дитина-сирота
-				$check_sirot = $_POST["check_sirot"] ?? "";
-				$query_sirot = ($check_sirot == "Так") ? " AND s_sirota IN ('Так')" : "";
-
-				// Збираємо умови для соціальних категорій
-				$social_conditions = [];
-
-				if (isset($_POST["check_sirot"]) && $_POST["check_sirot"] === "Так") {
-					$social_conditions[] = "s_sirota = 'Так'";
-				}
-				if (isset($_POST["check_peres"]) && $_POST["check_peres"] === "Так") {
-					$social_conditions[] = "s_peresel = 'Так'";
-				}
-				if (isset($_POST["check_chernob"]) && $_POST["check_chernob"] === "Так") {
-					$social_conditions[] = "s_chernob = 'Так'";
-				}
-				if (isset($_POST["check_ivalid"]) && $_POST["check_ivalid"] === "Так") {
-					$social_conditions[] = "s_inval = 'Так'";
-				}
-				if (isset($_POST["check_malozab"]) && $_POST["check_malozab"] === "Так") {
-					$social_conditions[] = "s_malozab = 'Так'";
-				}
-				if (isset($_POST["check_ato"]) && $_POST["check_ato"] === "Так") {
-					$social_conditions[] = "s_ato = 'Так'";
-				}
-				if (isset($_POST["check_uchbd"]) && $_POST["check_uchbd"] === "Так") {
-					$social_conditions[] = "s_war_act = 'Так'";
-				}
-				if (isset($_POST["check_ditzag"]) && $_POST["check_ditzag"] === "Так") {
-					$social_conditions[] = "s_ditzag = 'Так'";
-				}
-				if (isset($_POST["check_stepver"]) && $_POST["check_stepver"] === "Так") {
-					$social_conditions[] = "s_rada = 'Так'";
-				}
-				if (isset($_POST["check_shaht"]) && $_POST["check_shaht"] === "Так") {
-					$social_conditions[] = "s_shahter = 'Так'";
-				}
-
-				if (!empty($social_conditions)) {
-					// Об'єднуємо умови через OR й заносимо їх у групу
-					$query_social = " AND (" . implode(" OR ", $social_conditions) . ")";
-				} else {
-					$query_social = "";
-				}
-
-
-				///По групі
-				$check_group = $_POST["form_group"] ?? "";
-				$query_group = ($check_group != "") ? " AND s_group = '" . mysqli_real_escape_string($linc, $check_group) . "'" : "";
-
-				///Вік
-				$vik_from = $_POST["vik_from"] ?? '';
-				$vik_to   = $_POST["vik_to"] ?? '';
-				$query_vik = "";
-
-				// Перевірка, чи введені числа
-				if ($vik_from !== '' && $vik_to !== '') {
-					$query_vik = " AND s_vik BETWEEN " . intval($vik_from) . "  AND " . intval($vik_to);
-				} elseif ($vik_from !== '') {
-					$query_vik = "  AND s_vik >= " . intval($vik_from). " ";
-				} elseif ($vik_to !== '') {
-					$query_vik = " AND s_vik <= " . intval($vik_to). " "	;
-				}
-
-
-				// Сортування
-				$sort_by = $_REQUEST['sort_by'] ?? '';
-				$sort_dir = strtoupper($_REQUEST['sort_dir'] ?? 'ASC');
-
-				$allowed_sorts = ['s_pr', 's_group', 's_cours', 's_dnar', 'operation_date', 'operation_name'];
-				$allowed_dirs = ['ASC', 'DESC'];
-				$order_clause = '';
-	
-				if (in_array($sort_by, $allowed_sorts) && in_array($sort_dir, $allowed_dirs)) {
-					if ($sort_by === 's_cours') {
-						// Приведення s_cours до числового значення для правильного сортування
-						$order_clause = " ORDER BY CAST(s_cours AS UNSIGNED) $sort_dir ";
-					} elseif ($sort_by === 's_dnar') {
-						// Якщо потрібно сортувати віком шляхом перетворення, використовуйте відповідну логіку
-						$order_clause = " ORDER BY CAST(s_vik AS UNSIGNED) $sort_dir ";
-					} elseif ($sort_by === 'operation_date') {
-						$order_clause = " ORDER BY operation_date $sort_dir ";
-					} elseif ($sort_by === 'operation_name') {
-						$order_clause = " ORDER BY operation_name $sort_dir ";
-					} else {
-						$order_clause = " ORDER BY $sort_by COLLATE utf8_unicode_ci $sort_dir ";
-					}
-				}
-				
-				// Додаємо умову фільтра operation_name
-				$where_filter = "";
-				if ($filter_operation !== "") {
-					$filter_safe = mysqli_real_escape_string($linc, $filter_operation);
-					$where_filter = " AND operation_name IN ('$filter_safe') ";
-				}
-
-	 $query_all = 
-	 $query_vz . $query_gz . $query_sp . $query_sk . $query_vg . $query_st . $query_os  . $query_yer . $query_mp .
-	$query_sr . $query_sirot . $query_peres . $query_chernob . $query_ivalid . $query_malozab . $query_ato .
-	$query_uchbd . $query_ditzag . $query_stepver . $query_shaht . $query_group . $query_vik . $where_filter. $query_region . $query_social . $order_clause;
-
-		 $query_all;
-	session_start();
-	$_SESSION['query_all'] = $query_all;
-
-	$result_to_xlsx = "SELECT * FROM old_student WHERE $query_all";
-	$_SESSION['result_to_xlsx'] = $result_to_xlsx;	
-			}
-	$i=1;
-	$query_all = $_SESSION['query_all'];
-	$result_searh = mysqli_query($linc, "SELECT * FROM old_student WHERE $query_all");
-		
-
-	
-// Визначаємо кількість записів на сторінку
-
-
-// Якщо номер сторінки передається GET-параметром, використовуємо його; якщо ні — перша сторінка
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) {
-    $page = 1;
-}
-
-// Обчислюємо зсув (offset)
-$offset = ($page - 1) * $limit;
-
-// Якщо фільтр було застосовано, він має бути в $_SESSION['query_all']
-// Якщо ні — встановлюємо фільтрацію за замовчуванням, напр., "1=1"
-if (!isset($_SESSION['query_all']) || $_SESSION['query_all'] == '') {
-    $_SESSION['query_all'] = "1=1";
-}
-$query_all = $_SESSION['query_all'];
-
-// Спочатку отримуємо загальну кількість записів за умовою
-$query_count = "SELECT COUNT(*) as total FROM old_student WHERE $query_all";
-$result_count = mysqli_query($linc, $query_count);
-$row_count = mysqli_fetch_assoc($result_count);
-$total = $row_count['total'];
-$totalPages = ceil($total / $limit);
-
-// Отримуємо лише потрібну частину записів за умовою з пагінацією
-$query_with_limit = "SELECT * FROM old_student WHERE $query_all LIMIT $offset, $limit";
-$result_searh = mysqli_query($linc, $query_with_limit);
-
-if (mysqli_num_rows($result_searh) == 0) {
-    echo '<h3 class="margin-bottom" style="margin-left:0px; text-align:center; color:#56693c;"><strong>Пошук не дав результатів</strong></h3>';
-} else {
-    echo '<h3 class="margin-bottom" style="margin-left:0px; text-align:center; color:#56693c;"><strong>Результат виконання запиту: знайдено ' . $total . ' студентів</strong></h3>';
-    echo '<div class="col-md-12 ">
-            <table class="table table-primary mx-auto rounded-1 table-striped  table-responsive-md fs-3 fs-sm-1">';
-    
-    $i = $offset + 1;
-    while ($row = mysqli_fetch_array($result_searh)) {
-        echo '<tr>
-                <td style="white-space: nowrap;"><strong>' . $i . '</strong></td>
-				<td class="col-md-2 white-space: nowrap; fs-4 text-center align-middle "><strong>' . $row['operation_name'] . '</strong></td>
-                <td class="col-md-2"><strong>' . $row['s_pr'] . '</strong></td>
-                <td class="col-md-2"><strong>' . $row['s_im'] . '</strong></td>
-                <td class="col-md-2"><strong>' . $row['s_bat'] . '</strong></td>
-                <td class="text-center" style="white-space: nowrap;"><strong>' . $row['s_group'] . '</strong></td>
-                <td style="white-space: nowrap;" class=" text-center"><strong>курс &nbsp' . $row['s_cours'] . '</strong></td>
-                <td class="text-center" style="text-decoration-line: underline; padding-left:5px; width: 250px;">
-                    <strong>
-                        <a href="view_old_student.php?id_st=' . $row["s_id"] . '">Перегляд</a> 
-                       	 ';
-                            if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-                                echo ' 
-								';
-                            }
-                            
-                            echo '
-                    </strong>
-                </td>
-             </tr>';
-        $i++;
-    }
-    echo '</table></div>';
-    
-    // Вивід пагінації
-	echo '<div class="container-fluid d-flex justify-content-center align-items-center ">';
-
-    echo '<nav aria-label="Сторінкова навігація"  >';
-    echo '<ul class="pagination justify-content-center "  >';
-    
-    // Посилання "Попередня"
-    if ($page > 1) {
-        echo '<li class="page-item"><a class="page-link" href="?page=' . ($page - 1) . '">&laquo; Попередня</a></li>';
-    } else {
-        echo '<li class="page-item disabled"><span class="page-link">&laquo; Попередня</span></li>';
-    }
-    
-    // Виводимо посилання для кожної сторінки (можна використовувати оптимізацію, якщо сторінок дуже багато)
-
-	for ($i = 1; $i <= $totalPages; $i++) {
-    $active = ($i == $page) ? 'active' : '';
-    echo '<li class="page-item ' . $active . '">
-        <a class="page-link" href="?page=' . $i . '&limit=' . $limit . '">' . $i . '</a>
-    </li>';
-}
-    
-    // Посилання "Наступна"
-    if ($page < $totalPages) {
-        echo '<li class="page-item"><a class="page-link" href="?page=' . ($page + 1) . '">Наступна &raquo;</a></li>';
-    } else {
-        echo '<li class="page-item disabled"><span class="page-link">Наступна &raquo;</span></li>';
-    }
-    
-    echo '</ul>';
-    echo '</nav>
-	</div>';
-}
-	 
-
-
-	?>   
 							<!-- Вибір кількості записів на сторінці -->
-				<div class="container-fluid d-flex justify-content-end align-items-center ">
+				</div>
+						<div class="container-fluid d-flex justify-content-end align-items-center ">
 
 				<form method="GET" action="" >
 					<label for="limit">Записів на сторінці:</label>
-					<select name="limit" id="limit" onchange="this.form.submit()">
+					<select name="limit" id="limit" onchange="AsyncRouter.filterOldStudents(document.getElementById('filter-form'), 1, this.value)">
 						<?php foreach ([10, 25, 50, 100] as $opt): ?>
 							<option value="<?php echo $opt; ?>" <?php if ($opt == $limit) echo 'selected'; ?>><?php echo $opt; ?></option>
 						<?php endforeach; ?>
 					</select>
 					<input type="hidden" name="page" value="1">
-				</form>				
+				</form>
+				<div id="pagination-container" style="margin-top: 20px;"></div>				
                               </div>                 
                             </div>
                         </div>
@@ -971,4 +502,43 @@ if (mysqli_num_rows($result_searh) == 0) {
 
  
  <body>
+        <!-- Scripts -->
+        <script src="assets/js/toast-notifications.js"></script>
+        <script src="async.js"></script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitBtn = document.getElementById('submit-filter');
+            const clearBtn = document.getElementById('clear-filter');
+            const form = document.getElementById('filter-form');
+
+            // Submit filter
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    AsyncRouter.filterOldStudents(form, 1, document.getElementById('limit') ? document.getElementById('limit').value : 50);
+                });
+            }
+
+            // Clear filters
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (form) form.reset();
+                    AsyncRouter.clearFiltersFromLocalStorage();
+                    const results = document.getElementById('results-table');
+                    if (results) results.innerHTML = '';
+                    const pag = document.getElementById('pagination-container');
+                    if (pag) pag.innerHTML = '';
+                    ToastNotification.info('Фільтри очищені');
+                });
+            }
+
+            const savedFilters = AsyncRouter.loadFiltersFromLocalStorage && AsyncRouter.loadFiltersFromLocalStorage();
+            if (savedFilters && form) {
+                AsyncRouter.applyFiltersToForm(form, savedFilters);
+                AsyncRouter.filterOldStudents(form, 1, document.getElementById('limit') ? document.getElementById('limit').value : 50);
+            }
+        });
+        </script>
 </html>

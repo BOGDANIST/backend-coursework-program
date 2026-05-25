@@ -13,53 +13,54 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
     $id_group = $_GET["g_im_edit"];
     //$name_group_old=$_POST["form_group"];
-    if ($_POST["submit_save_gr"]) {
-        if ($_POST["form_group"] != '') {
-            $name_group = $_POST["form_group"];
-        }
+    
+    // if ($_POST["submit_save_gr"]) {
+    //     if ($_POST["form_group"] != '') {
+    //         $name_group = $_POST["form_group"];
+    //     }
 
 
-        mysqli_query($linc, "UPDATE st_group SET g_count_stud='{$_POST["form_ks"]}' WHERE g_im='$id_group'");
-        mysqli_query($linc, "UPDATE st_group SET g_count_derg='{$_POST["form_ksd"]}' WHERE g_im='$id_group'");
-        mysqli_query($linc, "UPDATE st_group SET g_count_comerc='{$_POST["form_ksk"]}' WHERE g_im='$id_group'");
-        mysqli_query($linc, "UPDATE st_group SET g_nastav='{$_POST["form_nast"]}' WHERE g_im='$id_group'");
+    //     mysqli_query($linc, "UPDATE st_group SET g_count_stud='{$_POST["form_ks"]}' WHERE g_im='$id_group'");
+    //     mysqli_query($linc, "UPDATE st_group SET g_count_derg='{$_POST["form_ksd"]}' WHERE g_im='$id_group'");
+    //     mysqli_query($linc, "UPDATE st_group SET g_count_comerc='{$_POST["form_ksk"]}' WHERE g_im='$id_group'");
+    //     mysqli_query($linc, "UPDATE st_group SET g_nastav='{$_POST["form_nast"]}' WHERE g_im='$id_group'");
 
 
-        if ($_POST["g_fn"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_formnavch='{$_POST["g_fn"]}' WHERE  g_im='$id_group'");
-        }
-        if ($_POST["g_gz"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_galuz='{$_POST["g_gz"]}' WHERE  g_im='$id_group'");
-        }
-        if ($_POST["g_sp"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_spec='{$_POST["g_sp"]}' WHERE  g_im='$id_group'");
-        }
-        if ($_POST["g_sz"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_specz='{$_POST["g_sz"]}' WHERE  g_im='$id_group'");
-        }
-        if ($_POST["g_kurs"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_course='{$_POST["g_kurs"]}' WHERE  g_im='$id_group'");
-        }
-        if ($_POST["g_vp"] != '') {
-            mysqli_query($linc, "UPDATE st_group SET g_vipusc='{$_POST["g_vp"]}' WHERE  g_im='$id_group'");
-        }
+    //     if ($_POST["g_fn"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_formnavch='{$_POST["g_fn"]}' WHERE  g_im='$id_group'");
+    //     }
+    //     if ($_POST["g_gz"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_galuz='{$_POST["g_gz"]}' WHERE  g_im='$id_group'");
+    //     }
+    //     if ($_POST["g_sp"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_spec='{$_POST["g_sp"]}' WHERE  g_im='$id_group'");
+    //     }
+    //     if ($_POST["g_sz"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_specz='{$_POST["g_sz"]}' WHERE  g_im='$id_group'");
+    //     }
+    //     if ($_POST["g_kurs"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_course='{$_POST["g_kurs"]}' WHERE  g_im='$id_group'");
+    //     }
+    //     if ($_POST["g_vp"] != '') {
+    //         mysqli_query($linc, "UPDATE st_group SET g_vipusc='{$_POST["g_vp"]}' WHERE  g_im='$id_group'");
+    //     }
 
-        if ($_POST["form_im_gr"] != '')
-            mysqli_query($linc, "UPDATE st_group SET g_im='{$_POST["form_im_gr"]}' WHERE g_im='$id_group'");
+    //     if ($_POST["form_im_gr"] != '')
+    //         mysqli_query($linc, "UPDATE st_group SET g_im='{$_POST["form_im_gr"]}' WHERE g_im='$id_group'");
 
 
-        $success = 'Зміни проведені успішно';
+    //     $success = 'Зміни проведені успішно';
 
-        if ($_POST["g_kurs"] != '')
-            mysqli_query($linc, "UPDATE student SET s_cours='{$_POST["g_kurs"]}' WHERE  s_group='$id_group'");
+    //     if ($_POST["g_kurs"] != '')
+    //         mysqli_query($linc, "UPDATE student SET s_cours='{$_POST["g_kurs"]}' WHERE  s_group='$id_group'");
 
-        if ($_POST["g_vp"] != '') {
-            mysqli_query($linc, "UPDATE student SET s_vip='{$_POST["g_vp"]}' WHERE  s_group='$id_group'");
-        }
-        if ($_POST["form_im_gr"] != '')
-            mysqli_query($linc, "UPDATE student SET s_group='{$_POST["form_im_gr"]}' WHERE  s_group='$id_group'");
-    }
-    ;
+    //     if ($_POST["g_vp"] != '') {
+    //         mysqli_query($linc, "UPDATE student SET s_vip='{$_POST["g_vp"]}' WHERE  s_group='$id_group'");
+    //     }
+    //     if ($_POST["form_im_gr"] != '')
+    //         mysqli_query($linc, "UPDATE student SET s_group='{$_POST["form_im_gr"]}' WHERE  s_group='$id_group'");
+    // }
+    // ;
 
 
 
@@ -217,7 +218,8 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
     <!-- Google Fonts-->
     <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-
+        <script src="assets/js/toast-notifications.js"></script>
+              <link rel="stylesheet" href="assets/css/toast-notifications.css">
     <style>
         .fakeimg {
             height: 200px;
@@ -251,18 +253,10 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <?php include("../include/adm_menu.php"); ?>
     <?php include("../include/background_icon.php"); ?>
 
-    <!-- End Top Menu -->
 
-
-    <!-- Portfolio -->
     <div id="portfolio" class="bottom-border-shadow">
 
         <div class="container bottom-border">
-
-            <!-- End Portfolio -->
-
-            <!-- === END CONTENT === -->
-            <!-- === BEGIN FOOTER === -->
             <div id="base">
                 <div id="content">
                     <div class="container background-white" style="margin:0px; padding:10px;">
@@ -285,9 +279,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                                         $row = mysqli_fetch_array($result);
                                         do {
 
-                                            echo '        
+                                            echo '
                                <label><strong>Назва групи</strong></label>
-								<strong> <input type="text" class="form-control" name="form_im_gr" value="' . $row['g_im'] . '" style="background:white; color:#0c0e0c; border:none;"  ></strong>
+								<strong> <input type="text" class="form-control" name="form_im_group" value="' . $row['g_im'] . '" style="background:white; color:#0c0e0c; border:none;"  ></strong>
 								
 								<label><strong><strong>Форма навчання</strong></label>
 								 <input type="text" class="form-control" name="form_fn" value="' . $row['g_formnavch'] . '" style="background:white; color:#0c0e0c; border:none;"  >
@@ -367,8 +361,11 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
 
                                     <p>
-                                        <input type="submit" class="form-control " id="submit-form"
-                                            name="submit_save_gr" value="Зберегти зміни">
+                                        <button type="button" class="form-control bg-success" id="submit-form"
+                                        
+                                            onclick="console.log(this.form.closest('form'));  AsyncRouter.editGroup('<?= isset($id_group) ? $id_group : '' ?>', this.form.closest('form')); return false;">
+                                            Зберегти зміни
+                                        </button>
                                     </p>
 
                                 </form>
@@ -414,9 +411,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                                         </div>
                                     </div>
                                 </div>
-
-
-
                             </div>
                         </div>
                     </div>
@@ -424,32 +418,39 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
 
 
-                <!-- End Sample Menu -->
+            
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
+
     <!-- Footer -->
     <?php include("../include/footer.php"); ?>
 
     <!-- End Footer -->
-    <!-- JS -->
-    <script type="text/javascript" src="assets/js/jquery.min.js" type="text/javascript"></script>
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+
+    <!-- <script type="text/javascript" src="assets/js/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="assets/js/scripts.js"></script>
-    <!-- Isotope - Portfolio Sorting -->
+    Isotope - Portfolio Sorting 
     <script type="text/javascript" src="assets/js/jquery.isotope.js" type="text/javascript"></script>
-    <!-- Mobile Menu - Slicknav -->
+    // Mobile Menu - Slicknav 
     <script type="text/javascript" src="assets/js/jquery.slicknav.js" type="text/javascript"></script>
-    <!-- Animate on Scroll-->
+    // Animate on Scroll/>
     <script type="text/javascript" src="assets/js/jquery.visible.js" charset="utf-8"></script>
-    <!-- Sticky Div -->
+    // Sticky Div />
     <script type="text/javascript" src="assets/js/jquery.sticky.js" charset="utf-8"></script>
-    <!-- Slimbox2-->
-    <script type="text/javascript" src="assets/js/slimbox2.js" charset="utf-8"></script>
-    <!-- Modernizr -->
-    <script src="assets/js/modernizr.custom.js" type="text/javascript"></script>
+    // Slimbox2/>
+    <script type="text/javascript" src="assets/js/slimbox2.js" charset="utf-8"></script> />
+    // Modernizr 
+    <script src="assets/js/modernizr.custom.js" type="text/javascript"></script>-->
+    <!-- Toast Notifications -->
+
+        <script src="async.js"></script>
+
 
     <body>
 

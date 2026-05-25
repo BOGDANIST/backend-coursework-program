@@ -89,6 +89,8 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
             }
             ?>
             <form method="POST" class="needs-validation signup-page" novalidate>
+                <input type="hidden" name="id" value="<?= isset($id_spec) ? htmlspecialchars($id_spec) : '' ?>">
+                <input type="hidden" name="id_sp" value="<?= isset($row['id_sp']) ? htmlspecialchars($row['id_sp']) : '' ?>">
                 <div class="mb-3">
                     <label for="id_galuz" class="form-label"><strong>ID Галузі</strong></label>
                     <input type="text" name="id_galuz" class="form-control" id="id_galuz" value="<?= htmlspecialchars($row['id_galuz']) ?>" required>
@@ -125,7 +127,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                     </div>
                 </div>
                 <div class="d-grid">
-                    <input type="submit" name="submit_save" value="Зберегти зміни" class="btn btn-primary btn-lg" id="submit-form">
+                    <input type="button" onclick="AsyncRouter.editSpec('<?= isset($id_spec) ? $id_spec : '' ?>', this.form.closest('form')); return false;" value="Зберегти зміни" class="btn btn-primary btn-lg" id="submit-form">
                 </div>
             </form>
         </div>
@@ -155,5 +157,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
             })
         })()
     </script>
+    <!-- Toast Notifications -->
+    <script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+    <!-- Async Router -->
+    <script type="text/javascript" src="async.js" type="text/javascript"></script>
 </body>
 </html>

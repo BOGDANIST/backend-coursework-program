@@ -47,6 +47,7 @@ else
 
         <!-- Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../assets/css/toast-notifications.css" rel="stylesheet">
     
 	<style>
   .fakeimg {
@@ -65,8 +66,9 @@ else
 }
 
 	</style>
-	
+
 	</head>
+	<div id="toast-container"></div>
                <div id="header">
                 <div class="container" >
                     <div class="row col-12" >
@@ -126,7 +128,7 @@ else
                                     <strong><a href="edit_user.php?user_id_edit=' . $row["user_id"] . '">Змінити</a></strong>
                                 </div>
                                 <div class="col-2 g-1 text-decoration-underline">
-                                    <strong><a href="list_users.php?user_id_delete=' . $row["user_id"] . '" onclick="return confirmSpelll();">Видалити</a></strong>
+                                    <strong><a href="#" onclick="AsyncRouter.deleteUser(' . $row["user_id"] . '); return false;">Видалити</a></strong>
                                 </div>
                             </div>
                         </div>';
@@ -185,30 +187,21 @@ else
  	
 
 
+
  <body>
 </html>
 
+<script src="../assets/js/toast-notifications.js"></script>
+<script src="../async.js"></script>
+
 <?php
 
-	
-	echo '
-    <script>
-	function confirmSpelll() 
-		{
-		if (confirm("Буде видалено користувача. Ви підтверджуєте видалення?")) 
-			{
-				return true;
-			} 
-		else 
-			{
-				return false;
-			}
-		}
-	 </script>
-	';
-			echo $_GET["user_id_delete"];
-			mysqli_query($linc,"DELETE FROM users WHERE user_id='".$_GET["user_id_delete"]."'");
-		
-		 
-	
-?>		
+// Provide a function to reload the list after deletion if needed
+echo '
+<script>
+function loadUsersList() {
+    location.reload();
+}
+</script>
+';
+?>

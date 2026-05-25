@@ -7,29 +7,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 } else {
     include("../include/db_connect.php");
     error_reporting(0);
-
-    $message = "";
-    // Обробка форми при її відправленні
-    if (isset($_POST['submit_add'])) {
-        // Екранування значень для безпеки
-        $id_sp       = mysqli_real_escape_string($linc, $_POST['id_sp']);
-        $id_galuz    = mysqli_real_escape_string($linc, $_POST['id_galuz']);
-        $im_galuz    = mysqli_real_escape_string($linc, $_POST['im_galuz']);
-        $id_spec     = mysqli_real_escape_string($linc, $_POST['id_spec']);
-        $im_spec     = mysqli_real_escape_string($linc, $_POST['im_spec']);
-        $im_specializ= mysqli_real_escape_string($linc, $_POST['im_specializ']);
-
-        // SQL запит на вставку нового запису
-        $query = "INSERT INTO spec (id_sp, id_galuz, im_galuz, id_spec, im_spec, im_specializ) 
-                  VALUES ('$id_sp', '$id_galuz', '$im_galuz', '$id_spec', '$im_spec', '$im_specializ')";
-
-        if (mysqli_query($linc, $query)) {
-            $success ="Спеціальність успішно додано!";
-          
-        } else {
-           $error=="Помилка:". mysqli_error($linc);
-        }
-    }
 }
 ?>
 <!DOCTYPE html>
@@ -37,15 +14,17 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 <head>
     <meta charset="UTF-8">
     <title>Додавання спеціальності</title>
-    
+
         <!-- Bootstrap Core CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
-		
+		<!-- Toast Notifications CSS -->
+		<link rel="stylesheet" href="assets/css/toast-notifications.css">
+
     <!-- Ваші додаткові стилі -->
     <link rel="stylesheet" href="../css/my_style.css">
-     
+
 </head>
 <body>
                 <div id="header">
@@ -61,17 +40,22 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                     </div>
                 </div>
             </div>
-            
+
     <!-- Можна підключити верхнє меню або шапку -->
     <?php include("../include/adm_menu.php"); ?>
 <?php include ("../include/background_icon.php");?>
     <div class="container my-4">
         <h2 class="text-center mb-4">Додавання спеціальності</h2>
-        <!-- Повідомлення після спроби вставки -->
-        <?php echo $message; ?>
 
-        <form method="POST" class="needs-validation signup-page" novalidate>
+        <form id="add-spec-form" class="needs-validation signup-page" novalidate>
 
+            <div class="mb-3">
+                <label for="id_sp" class="form-label"><strong>ID Спеціальності</strong></label>
+                <input type="text" name="id_sp" id="id_sp" class="form-control" required>
+                <div class="invalid-feedback">
+                    Будь ласка, введіть ID.
+                </div>
+            </div>
             <div class="mb-3">
                 <label for="id_galuz" class="form-label"><strong>ID Галузі</strong></label>
                 <input type="text" name="id_galuz" id="id_galuz" class="form-control" required>
@@ -108,12 +92,23 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                 </div>
             </div>
             <div class="d-grid">
-                <input type="submit" name="submit_add" value="Додати спеціальність" id="submit-form"  class="btn  " >
+                <button type="button" id="submit-form" onclick="AsyncRouter.addSpec(this.form.closest('form')); return false;" class="btn btn-success">
+                    Додати спеціальність
+                </button>
             </div>
         </form>
     </div>
-        <!-- Footer -->        
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+        <!-- Footer -->
  	<?php include ("../include/footer.php");?>
+
+    <!-- Toast Notifications -->
+    <script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+    <!-- Async Router -->
+    <script type="text/javascript" src="async.js" type="text/javascript"></script>
 
     <!-- JavaScript для валідації форми (Bootstrap) -->
     <script>
@@ -134,3 +129,4 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     </script>
 </body>
 </html>
+

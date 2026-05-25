@@ -1,80 +1,18 @@
 <?php
 session_start();
 
-	if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer']))
-	{   
-		header("Location: admin_panel.php");
-	}    
-else
-	{
-	 include ("../include/db_connect.php");
- 	 error_reporting(0);
-	
-	  $id_st=$_GET["id_st"];
-	
-	 if($_POST["submit_save"])
-	 {
-		if($_POST["form_group"]!='')
-	    {
-		$name_group=$_POST["form_group"];
-			$result = mysql_query("SELECT * FROM st_group WHERE g_im='$name_group'",$linc);
-			if (mysql_num_rows($result)>0)
-                    {$row = mysql_fetch_array($result);
-					 echo $g_im=$row["g_im"];
-					 echo $g_spec=$row['g_spec'];
-					 echo $g_specz=$row['g_specz'];
-					 echo $g_course=$row['g_course'];
-					 echo $g_formnavch=$row['g_formnavch'];
-					 echo $g_vipusk=$row['g_vipusc'];
-					 echo $g_galuz=$row['g_galuz'];
-					mysql_query("UPDATE old_student SET s_group='$g_im' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_galuz='$g_galuz' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_spec='$g_spec' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_specz='$g_specz' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_form_navch='$g_formnavch' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_group_vip='$g_vipusk' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_cours='$g_course' WHERE s_id='$id_st'",$linc);
-					};
-		}		
-				   if($_POST["form_dnar_stud"]!='')
-				   {$birthday = new DateTime($_POST["form_dnar_stud"]);
-					$interval = $birthday->diff(new DateTime);
-					$vik=$interval->y;
-				   }
-					
-					echo $_POST["form_pr_stud"];		
-					mysql_query("UPDATE old_student SET s_pr='{$_POST["form_pr_stud"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_im='{$_POST["form_im_stud"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_bat='{$_POST["form_bat_stud"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_dnar='{$_POST["form_dnar_stud"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_vik='{$vik}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_rik_zaver='{$_POST["form_zscool_stud"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_adresa='{$_POST["form_adres"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_tels='{$_POST["form_tel_st"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_telb='{$_POST["form_tel_bat"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_telm='{$_POST["form_tel_mut"]}' WHERE s_id='$id_st'",$linc);
-					mysql_query("UPDATE old_student SET s_osvita_type='{$_POST["s_osvita_type"]}' WHERE s_id='$id_st'",$linc);
-					
-					if($_POST["form_stat_select"]!=''){mysql_query("UPDATE old_student  SET s_stat='{$_POST["form_stat_select"]}' WHERE  s_id='$id_st'",$linc);}			
-					if($_POST["form_zamovl"]!=''){mysql_query("UPDATE old_student  SET s_contract='{$_POST["form_zamovl"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_reg_type"]!=''){mysql_query("UPDATE old_student  SET s_region_type='{$_POST["form_reg_type"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_region"]!=''){mysql_query("UPDATE old_student  SET s_region='{$_POST["form_region"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["s_osvita_type"]!=''){mysql_query("UPDATE old_student  SET s_osvita_type='{$_POST["s_osvita_type"]}' WHERE  s_id='$id_st'",$linc);}
+if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
+    header("Location: admin_panel.php");
+} else {
+    include ("../include/db_connect.php");
+    error_reporting(0);
 
-					if($_POST["form_sirot"]!=''){mysql_query("UPDATE old_student SET s_sirota='{$_POST["form_sirot"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_peres"]!=''){mysql_query("UPDATE old_student SET s_peresel='{$_POST["form_peres"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_chernob"]!=''){mysql_query("UPDATE old_student SET s_chernob='{$_POST["form_chernob"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_ivalid"]!=''){mysql_query("UPDATE old_student SET s_inval='{$_POST["form_ivalid"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_malozab"]!=''){mysql_query("UPDATE old_student SET s_malozab='{$_POST["form_malozab"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_ato"]!=''){mysql_query("UPDATE old_student SET s_ato='{$_POST["form_ato"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_uchbd"]!=''){mysql_query("UPDATE old_student SET s_war_act='{$_POST["form_uchbd"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_ditzag"]!=''){mysql_query("UPDATE old_student SET s_ditzag='{$_POST["form_ditzag"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_stepver"]!=''){mysql_query("UPDATE old_student SET s_rada='{$_POST["form_stepver"]}' WHERE  s_id='$id_st'",$linc);}
-					if($_POST["form_shaht"]!=''){mysql_query("UPDATE old_student SET s_shahter='{$_POST["form_shaht"]}' WHERE  s_id='$id_st'",$linc);}
-		
-	echo 'Зміни проведені';
-	};
-    };
+    $id_st = $_GET["id_st"] ?? null;
+
+    if (!$id_st) {
+        die("ID студента не вказано!");
+    }
+}
 ?>
 
 
@@ -111,6 +49,7 @@ else
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
  
  <body>   
+	<div id="toast-container"></div>
 	<style>
   .fakeimg {
       height: 200px;
@@ -118,6 +57,7 @@ else
 			}
 	</style>
 	
+        <link rel="stylesheet" href="../assets/css/toast-notifications.css" rel="stylesheet">
 	</head>
    
       <div id="body-bg">
@@ -245,6 +185,11 @@ else
 									<label>Тел.№ матері</label>
 									<input type="text" class="form-control" readonly value="'.$row['s_telm'].'" style="background:white; color:#0c0e0c; border:none;" >
 
+									<div style="margin-top: 20px;">
+										<button type="button" class="btn btn-danger" onclick="AsyncRouter.deleteOldStudent('.$row['s_id'].'); return false;">
+											Видалити студента
+										</button>
+									</div>
 								  ';
 						}
 					
@@ -277,5 +222,7 @@ else
  	<?php include ("../include/footer.php");?>
 
   
+	<script src="../assets/js/toast-notifications.js"></script>
+	<script src="../async.js"></script>
  </body>
 </html>

@@ -39,13 +39,6 @@ $result = mysqli_query($linc, $sql);
         <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
                 <!-- Template CSS -->
 		<link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
-        <!-- Template CSS 
-        <link rel="stylesheet" href="../assets/css/animate.css" rel="stylesheet">
-        <link rel="stylesheet" href="../assets/css/font-awesome.css" rel="stylesheet">
-        <link rel="stylesheet" href="../assets/css/nexus.css" rel="stylesheet">
-        <link rel="stylesheet" href="../assets/css/responsive.css" rel="stylesheet">
-		<link rel="stylesheet" href="../assets/css/custom.css" rel="stylesheet">
-         Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
         
 	
@@ -55,8 +48,10 @@ $result = mysqli_query($linc, $sql);
                 background: #aaa;
             }
         </style>
+        <link rel="stylesheet" href="assets/css/toast-notifications.css" rel="stylesheet">
     </head>
     <body>
+    <div id="toast-container"></div>
         <div id="body-bg">
             <!-- Phone/Email -->
 
@@ -127,3 +122,6 @@ $result = mysqli_query($linc, $sql);
         </div>
     </body>
 </html>
+
+<script src="assets/js/toast-notifications.js"></script>
+<script src="async.js"></script>

@@ -34,7 +34,7 @@ try {
     // Fields of knowledge
     $check_gz = $_POST['check_gz'] ?? [];
     if (empty($check_gz)) {
-        $gz_query = "SELECT DISTINCT s_galuz FROM student ORDER BY s_galuz ASC";
+        $gz_query = "SELECT DISTINCT s_galuz FROM old_student ORDER BY s_galuz ASC";
         $result = mysqli_query($linc, $gz_query);
         while ($row = mysqli_fetch_assoc($result)) {
             $check_gz[] = $row['s_galuz'];
@@ -181,13 +181,13 @@ try {
     }
 
     // Get total count
-    $count_query = "SELECT COUNT(*) as total FROM student WHERE $query_all";
+    $count_query = "SELECT COUNT(*) as total FROM old_student WHERE $query_all";
     $count_result = mysqli_query($linc, $count_query);
     $count_row = mysqli_fetch_assoc($count_result);
     $total = $count_row['total'];
 
     // Get paginated results
-    $data_query = "SELECT * FROM student WHERE $query_all $order_clause LIMIT $offset, $limit";
+    $data_query = "SELECT * FROM old_student WHERE $query_all $order_clause LIMIT $offset, $limit";
     $result = mysqli_query($linc, $data_query);
 
     if (!$result) {
