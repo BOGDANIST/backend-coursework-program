@@ -87,7 +87,7 @@ $result = mysqli_query($linc, $sql);
                         <?php 
                         if (mysqli_num_rows($result) > 0) {
                             echo '<div class="col-md-12" style="margin-top:10px;">';
-                            echo '<table class="table table-primary rounded-1 table-striped d-flex table-responsive-md fs-3 fs-sm-1 justify-content-center">';
+                            echo '<table class="table table-primary rounded-1 table-striped d-flex table-responsive-md fs-3 fs-sm-1 justify-content-md-center">';
                             echo '
                                     <tr>
                                         <th class="col-md-1 text-center align-middle" style="white-space: nowrap;">ID</th>

@@ -51,6 +51,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 			height: 200px;
 			background: #aaa;
 		}
+
 	</style>
 
 	</head>
@@ -131,7 +132,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 								 <input type="date" class="form-control" name="form_date_nar" value="' . $row['s_dnar'] . '" style="background:white; color:#0c0e0c; border:none;" >
 
 								<label><strong>Група</strong></label>
-								<input type="text" class="form-control" name="form_gr_stud" value="' . $row['s_group'] . '" style="background:white; color:#0c0e0c; border:none;"  >
+								<input type="text" class="form-control" name="form_group" value="' . $row['s_group'] . '" style="background:white; color:#0c0e0c; border:none;"  >
 								';
 
 												$query_group = mysqli_query($linc, "SELECT * FROM st_group");

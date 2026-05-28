@@ -173,6 +173,13 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
 									</div>
 									<hr>
 
+									<label>Дата перенесення в архів</label>
+									<input type="text" class="form-control" readonly value="'.$row['operation_date'].'" style="background:white; color:#0c0e0c; border:none;" >
+
+									
+									<label>Причина</label>
+									<input type="text" class="form-control" readonly value="'.$row['operation_name'].'" style="background:white; color:#0c0e0c; border:none;" >
+
 									<label>Адреса</label>
 									<input type="text" class="form-control" readonly value="'.$row['s_adresa'].'" style="background:white; color:#0c0e0c; border:none;" >
 
@@ -185,11 +192,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
 									<label>Тел.№ матері</label>
 									<input type="text" class="form-control" readonly value="'.$row['s_telm'].'" style="background:white; color:#0c0e0c; border:none;" >
 
-									<div style="margin-top: 20px;">
-										<button type="button" class="btn btn-danger" onclick="AsyncRouter.deleteOldStudent('.$row['s_id'].'); return false;">
-											Видалити студента
-										</button>
-									</div>
+
 								  ';
 						}
 					

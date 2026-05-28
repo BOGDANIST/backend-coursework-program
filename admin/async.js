@@ -10,11 +10,11 @@ const AsyncRouter = {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
 
-            //console.log('Applying filters:', filters);
+            console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
-                this.renderStudentTable(response.data, false, page, limit);
+                this.renderStudentTable(response.data, false);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
                 ToastNotification.info(response.message);
@@ -27,37 +27,14 @@ const AsyncRouter = {
         }
     },
 
-
-    // async filterOldStudents(formElement = null, page = 1, limit = 50) {
-    //     try {
-    //         const form = formElement || document.getElementById('filter-form');
-    //         const filters = this.collectFilterData(form);
-
-    //         console.log('Applying filters:', filters);
-    //         const response = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
-
-    //         if (response.success) {
-    //             this.renderStudentTable(response.data);
-    //             this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
-    //             this.saveFiltersToLocalStorage(filters);
-    //             ToastNotification.info(response.message);
-    //         } else {
-    //             ToastNotification.error(response.message || 'Помилка при пошуку студентів');
-    //         }
-    //     } catch (error) {
-    //         console.error('Filter error:', error);
-    //         ToastNotification.error('Помилка при пошуку студентів');
-    //     }
-    // },
-
     async filterGroups(formElement = null, page = 1, limit = 50) {
         try {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
 
-            //console.log('Applying filters:', filters);
+            console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_groups.php?page=' + page + '&limit=' + limit, 'POST', filters);
-            //console.log(response);
+
             if (response.success) {
                 this.renderGroupTable(response.data);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterGroups');
@@ -77,11 +54,11 @@ const AsyncRouter = {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
 
-           // console.log('Applying filters:', filters);
+            console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
-                this.renderStudentTable(response.data, true, page, limit);
+                this.renderStudentTable(response.data, true);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterOldStudents');
                 this.saveFiltersToLocalStorage(filters);
                 ToastNotification.info(response.message);
@@ -99,11 +76,11 @@ const AsyncRouter = {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
 
-           //console.log('Applying filters:', filters);
+            console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_old_groups.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
-                this.renderGroupTable(response.data, true);
+                this.renderGroupTable(response.data);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterOldGroups');
                 this.saveFiltersToLocalStorage(filters);
                 ToastNotification.info(response.message);
@@ -166,12 +143,15 @@ const AsyncRouter = {
         try {
             const formData = new FormData(formElement);
             formData.append('id', studentId);
+            //console.log('Editing student with data:', Object.fromEntries(formData));
             const response = await this.sendRequest('crud/edit_student.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Студента успішно оновлено');
-                // Reload students list
-                this.filterStudents();
+                // Update form fields with returned data
+                if (response.data) {
+                    this.updateStudentFormFields(formElement, response.data);
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -181,6 +161,60 @@ const AsyncRouter = {
         } catch (error) {
             console.error('Edit error:', error);
             ToastNotification.error('Помилка при оновленні студента');
+        }
+    },
+
+    updateStudentFormFields(formElement, studentData) {
+        // Маппінг: БД поле -> [можливі імена в формі]
+        const fieldMappings = {
+            's_pr': ['form_pr_stud'],
+            's_im': ['form_im_stud'],
+            's_bat': ['form_bat_stud'],
+            's_stat': ['form_sex', 'form_stat_select'],
+            's_dnar': ['form_date_nar'],
+            's_group': ['form_group'],
+            's_contract': ['form_zamovl_stud', 'form_zamovl'],
+            's_rik_zaver': ['form_zscool'],
+            's_osvita_type': ['form_osvita_stud', 'form_osvita'],
+            's_region_type': ['form_reg_type_stud', 'form_reg_type'],
+            's_region': ['form_region_stud', 'form_region'],
+            's_adresa': ['form_adres'],
+            's_tels': ['form_tel_st'],
+            's_telb': ['form_tel_bat'],
+            's_telm': ['form_tel_mut'],
+            's_galuz': ['form_galuz'],
+            's_spec': ['form_spec'],
+            's_sirota': ['form_sirot'],
+            's_peresel': ['form_peres'],
+            's_inval': ['form_ivalid'],
+            's_malozab': ['form_malozab'],
+            's_war_act': ['form_uchbd'],
+            's_vip': ['form_vip'],
+            's_chernob': ['form_chernob'],
+            's_ato': ['form_ato'],
+            's_ditzag': ['form_ditzag'],
+            's_rada': ['form_rada'],
+            's_shahter': ['form_shahter']
+        };
+
+        for (const [dbField, formFieldNames] of Object.entries(fieldMappings)) {
+            if (studentData[dbField] !== undefined) {
+                const newValue = studentData[dbField] || '';
+
+                // Оновлюємо всі можливі імена цього поля
+                formFieldNames.forEach(fieldName => {
+                    const input = formElement.querySelector(`[name="${fieldName}"]`);
+                    if (input) {
+                        if (input.type === 'checkbox') {
+                            input.checked = newValue === 'Так';
+                        } else {
+                            input.value = newValue;
+                            input.setAttribute('value', newValue);
+                            input.defaultValue = newValue;
+                        }
+                    }
+                });
+            }
         }
     },
 
@@ -226,15 +260,19 @@ const AsyncRouter = {
     },
 
     async editGroup(groupId, formElement) {
+         
         try {
+            console.log('Editing group with data:',groupId);
             const formData = new FormData(formElement);
             formData.append('id', groupId);
-
+            //console.log('Editing group with data:');
             const response = await this.sendRequest('crud/edit_group.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Групу успішно оновлено');
-                this.filterGroups();
+                if (response.data) {
+                    this.updateGroupFormFields(formElement, response.data);
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -244,6 +282,40 @@ const AsyncRouter = {
         } catch (error) {
             console.error('Edit error:', error);
             ToastNotification.error('Помилка при оновленні групи');
+        }
+    },
+
+    updateGroupFormFields(formElement, groupData) {
+        // Маппінг: БД поле -> [можливі імена в формі]
+        const fieldMappings = {
+            'g_formnavch': ['form_fn', 'g_fn'],
+            'g_galuz': ['form_gz', 'g_gz'],
+            'g_spec': ['form_sp', 'g_sp'],
+            'g_specz': ['form_sz', 'g_sz'],
+            'g_course': ['form_cours', 'g_kurs'],
+            'g_vipusc': ['form_vp', 'g_vp'],
+            'g_im': ['form_im_group'],
+            'g_count_stud': ['form_ks'],
+            'g_count_derg': ['form_ksd'],
+            'g_count_comerc': ['form_ksk'],
+            'g_nastav': ['form_nast']
+        };
+
+       // console.log('Updating group form fields with data:', groupData);
+        for (const [dbField, formFieldNames] of Object.entries(fieldMappings)) {
+            if (groupData[dbField] !== undefined) {
+                const newValue = groupData[dbField] || '';
+
+                // Оновлюємо всі можливі імена цього поля
+                formFieldNames.forEach(fieldName => {
+                    const input = formElement.querySelector(`[name="${fieldName}"]`);
+                    if (input) {
+                        input.value = newValue;
+                        input.setAttribute('value', newValue);
+                        input.defaultValue = newValue;
+                    }
+                });
+            }
         }
     },
 
@@ -297,7 +369,9 @@ const AsyncRouter = {
 
             if (response.success) {
                 ToastNotification.success('Спеціальність успішно оновлено');
-                this.filterSpecialties();
+                if (response.data) {
+                    this.updateSpecFormFields(formElement, response.data);
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -307,6 +381,28 @@ const AsyncRouter = {
         } catch (error) {
             console.error('Edit error:', error);
             ToastNotification.error('Помилка при оновленні спеціальності');
+        }
+    },
+
+    updateSpecFormFields(formElement, specData) {
+        const fieldMapping = {
+            'id_galuz': 'id_galuz',
+            'im_galuz': 'im_galuz',
+            'id_spec': 'id_spec',
+            'im_spec': 'im_spec',
+            'im_specializ': 'im_specializ'
+        };
+
+        for (const [dbField, formField] of Object.entries(fieldMapping)) {
+            if (specData[dbField] !== undefined) {
+                const input = formElement.querySelector(`[name="${formField}"]`);
+                if (input) {
+                    const newValue = specData[dbField] || '';
+                    input.value = newValue;
+                    input.setAttribute('value', newValue);
+                    input.defaultValue = newValue;
+                }
+            }
         }
     },
 
@@ -574,23 +670,22 @@ const AsyncRouter = {
         });
     },
 
-    renderStudentTable(students, oldFormat = false, page = 1, limit = 50) {
-        console.log(page, limit);
-       // console.log('Rendering students:', students, 'Old format:', oldFormat);
+    renderStudentTable(students, isOld = false) {
+        console.log('Is old:', isOld);
         const container = document.getElementById('results-table');
         if (!container) return;
 
         let html = `
             <table class="table table-primary rounded-1 table-striped table-responsive-md fs-3">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Прізвище</th>
-                        <th>Ім'я</th>
-                        <th>По батькові</th>
-                        <th>Група</th>
-                        <th>Курс</th>
-                        <th>Дії</th>
+                <thead class="border-0">
+                    <tr >
+                        <th class="text-center">#</th>
+                        <th class="text-center">Прізвище</th>
+                        <th class="text-center">Ім'я</th>
+                        <th class="text-center">По батькові</th>
+                        <th class="text-center">Група</th>
+                        <th class="text-center">Курс</th>
+                        <th class="text-center">Дії</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -599,31 +694,31 @@ const AsyncRouter = {
         students.forEach((student, index) => {
             html += `
                 <tr>
-                    <td>${index + 1 + (page - 1) * limit}</td>
+                    <td>${index + 1}</td>
                     <td>${this.escapeHtml(student.s_pr)}</td>
                     <td>${this.escapeHtml(student.s_im)}</td>
                     <td>${this.escapeHtml(student.s_bat)}</td>
-                    <td>${this.escapeHtml(student.s_group)}</td>
-                    <td>${this.escapeHtml(student.s_cours)}</td>
-                    `;
-                    if (oldFormat) {
-                         html +=`
-                        <td>
-                            <a href="view_old_student.php?id_st=${student.s_id}">Перегляд</a>
-                        </td>
-                                        </tr>`;
-                    } else {
-                            html +=`
-                    <td>
-                        <a href="view_student.php?id_st=${student.s_id}">Перегляд</a>
-                        <a href="edit_student.php?id_st=${student.s_id}">Змінити</a>
-                        <a href="#" onclick="AsyncRouter.deleteStudent(${student.s_id}); return false;">Видалити</a>
-                    </td>
-                                    </tr>
+                    <td class="text-center">${this.escapeHtml(student.s_group)}</td>
+                    <td class="text-center">${this.escapeHtml(student.s_cours)}</td>
+                    `
+                    if (isOld) {
+                        html += `
+                    <td class="d-flex justify-content-center border-0 gap-2">
+                        <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a></td>
+                    </tr>
                         `;
-                        }
+                    } else {
+                        html += `
+                    <td class="d-flex justify-content-center border-0 gap-2">
+                        <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a>
+                        <a href="edit_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-warning">Змінити</a>
+                        <a href="#" onclick="AsyncRouter.deleteOldStudent(${student.s_id}); return false;" class="btn btn-sm btn-danger">Видалити</a>
+                    </td>
+                    </tr>
+                         `;
+                    }
 
-
+    
         });
 
         html += `
@@ -634,8 +729,7 @@ const AsyncRouter = {
         container.innerHTML = html;
     },
 
-    renderGroupTable(groups, oldFormat = false) {
-        console.log('Rendering groups:', groups, 'Old format:', oldFormat);
+    renderGroupTable(groups) {
         const container = document.getElementById('results-table');
         if (!container) return;
 
@@ -653,13 +747,10 @@ const AsyncRouter = {
         `;
 
         groups.forEach((group, index) => {
-            if (oldFormat) {
-                const viewLink = group.g_id ? `view_old_group.php?id_group=${group.g_id}` : `view_old_group.php?id_group=${group.g_id}`;
-            } else {
-                // Support both new and old group formats
-                const viewLink = group.g_id ? `view_group.php?id_group=${group.g_id}` : `view_old_group.php?id_group=${group.g_id}`;
-                const editLink = group.g_id ? `edit_group.php?id_group=${group.g_id}` : `edit_old_group.php?id_group=${group.g_id}`;
-            }
+            // Support both new and old group formats
+            const viewLink = group.g_id ? `view_group.php?id_group=${group.g_id}` : `view_old_group.php?id_group=${group.g_id}`;
+            const editLink = group.g_id ? `edit_group.php?id_group=${group.g_id}` : `edit_old_group.php?id_group=${group.g_id}`;
+
             html += `
                 <tr>
                     <td>${index + 1}</td>
@@ -730,8 +821,8 @@ const AsyncRouter = {
         }
 
         let html = `
-            <nav aria-label="Сторінкова навігація">
-                <ul class="pagination justify-content-center">
+            <nav class="" aria-label="Сторінкова навігація">
+                <ul class="pagination d-flex justify-content-md-center w-100 flex-wrap">
         `;
 
         // Previous button
@@ -790,7 +881,7 @@ const AsyncRouter = {
 };
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // Load saved filters if on filter page
     const filterForm = document.getElementById('filter-form');
     if (filterForm) {

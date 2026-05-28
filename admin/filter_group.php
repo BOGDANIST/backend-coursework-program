@@ -121,332 +121,49 @@ else
 												 if (mysqli_num_rows( $result_group)>0) echo "<h3 class='fs-2 text-center'><strong>Всього у коледжі навчаеться ".mysqli_num_rows( $result_group)." груп, з яких:</strong></h3>";
 											?> </p>
 												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc, "SELECT * FROM st_group WHERE g_formnavch='Денна' AND g_course='1'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>І курс, денне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   											<td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '
-																			</tr>								
+												<?php
+												// Масив конфігурацій для всіх курсів та відділень
+												$configs = [
+													['course' => '1', 'form' => 'Денна', 'title' => 'І курс, денне відділення'],
+													['course' => '1', 'form' => 'Заочна', 'title' => 'І курс, заочне відділення'],
+													['course' => '2', 'form' => 'Денна', 'title' => 'ІІ курс, денне відділення'],
+													['course' => '2', 'form' => 'Заочна', 'title' => 'ІІ курс, заочне відділення'],
+													['course' => '3', 'form' => 'Денна', 'title' => 'ІІІ курс, денне відділення'],
+													['course' => '3', 'form' => 'Заочна', 'title' => 'ІІІ курс, заочне відділення'],
+													['course' => '4', 'form' => 'Денна', 'title' => 'ІV курс, денне відділення'],
+													['course' => '4', 'form' => 'Заочна', 'title' => 'ІV курс, заочне відділення'],
+												];
 
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
+												foreach ($configs as $config) {
+													$result_group1 = mysqli_query($linc, "SELECT * FROM `st_group` WHERE `g_formnavch`='" . mysqli_real_escape_string($linc, $config['form']) . "' AND `g_course`='" . mysqli_real_escape_string($linc, $config['course']) . "'");
+													//echo $result_group1 ;
+													if (mysqli_num_rows($result_group1) > 0) {
+														echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;">
+															<strong>' . htmlspecialchars($config['title']) . ':</strong>
+														</h3>
+														<div class="col-md-12">
+															<table class="table table-primary rounded-1 table-striped d-flex table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex ">';
+														
+														$i = 1;
+														while ($row = mysqli_fetch_array($result_group1)) {
+															echo '<tr>
+																<td class="col-md-1" style="white-space: nowrap;"><strong>' . $i . '</strong></td>
+																<td class="col-md-2"><strong>' . htmlspecialchars($row['g_im']) . '</strong></td>
+																<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: ' . htmlspecialchars($row['g_count_stud']) . '</strong></td>
+																<td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . urlencode($row["g_im"]) . '">Переглянути</a></strong></td>';
+															
+															if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+																echo '<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit=' . urlencode($row["g_im"]) . '">Змінити</a></strong></td>';
+															}
+															
+															echo '</tr>';
+															$i++;
+														}
+														
+														echo '</table></div>';
 													}
-												?>  
-												</div>
-											
-												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc, "SELECT * FROM st_group WHERE g_formnavch='Заочна' AND g_course='1'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>І курс, заочне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
-												</div>			
-											
-											<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc,"SELECT * FROM st_group WHERE g_formnavch='Денна' AND g_course='2'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІІ курс, денне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>   
-												</div>
-											
-												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc, "SELECT * FROM st_group WHERE g_formnavch='Заочна' AND g_course='2'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІІ курс, заочне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
-												</div>
-											
-											<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc,"SELECT * FROM st_group WHERE g_formnavch='Денна' AND g_course='3'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІІІ курс, денне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
-												</div>
-											
-												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc, "SELECT * FROM st_group WHERE g_formnavch='Заочна' AND g_course='3'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІІІ курс, заочне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																				
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
-												</div>
-											
-											<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc,"SELECT * FROM st_group WHERE g_formnavch='Денна' AND g_course='4'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІV курс, денне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
-												</div>
-											
-												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php                                      
-						
-													$result_group1=mysqli_query($linc, "SELECT * FROM st_group WHERE g_formnavch='Заочна' AND g_course='4'");
-													if (mysqli_num_rows($result_group1)>0)
-													{$i='1';
-														$row = mysqli_fetch_array($result_group1);
-															echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;" >
-																  <strong>ІV курс, заочне відділення:</strong>	
-																  </h3>';
-															echo '   
-																	<div class="col-md-12 " >
-																	<table  class="table table-primary rounded-1 table-striped d-flex  table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex justify-content-center">  
-																		';
-															do{
-															echo '
-																			<tr>
-																			<td class="col-md-1" style="white-space: nowrap;"><strong>'.$i.'</strong></td>
-																			<td class="col-md-2"><strong>'.$row['g_im'].'</strong></td>
-																			<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: '.$row['g_count_stud'].'</strong></td>
-                                   <td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . $row["g_im"] . '">Переглянути</a></strong></td>
-																			';
-																			if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																				echo ' 
-																				<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit='.$row["g_im"].'">Змінити</a></strong></td>
-																			
-																				';
-																			}
-																			
-																			echo '</tr>								
-
-																	'; 
-																	$i=$i+1;   
-																}
-																while ($row = mysqli_fetch_array($result_group1));
-															echo ' 		</table>
-																		</div>  ';  												
-													}
-												?>  
+												}
+												?>
 												</div>
 										
 										

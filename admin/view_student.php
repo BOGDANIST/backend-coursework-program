@@ -56,6 +56,11 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
       height: 200px;
       background: #aaa;
 			}
+			
+		img[alt="Logo"] {
+		
+			width: 100%;
+		}
 	</style>
 	
 	</head>
@@ -185,11 +190,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
 									<label>Тел.№ матері</label>
 									<input type="text" class="form-control" readonly value="'.$row['s_telm'].'" style="background:white; color:#0c0e0c; border:none;" >
 
-									<div style="margin-top: 20px;">
-										<button type="button" class="btn btn-danger" onclick="AsyncRouter.deleteStudent('.$row['s_id'].'); return false;">
-											Видалити студента
-										</button>
-									</div>
+
 								  ';
 						}
 					

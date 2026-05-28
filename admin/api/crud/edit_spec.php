@@ -56,8 +56,19 @@ try {
         throw new Exception('Помилка при оновленні спеціальності: ' . $stmt->error);
     }
 
+    // Fetch updated spec data to return to client
+    $selectStmt = $linc->prepare("SELECT * FROM spec WHERE id_sp = ?");
+    if (!$selectStmt) {
+        throw new Exception('Помилка при отриманні даних: ' . $linc->error);
+    }
+    $selectStmt->bind_param('i', $spec_id);
+    $selectStmt->execute();
+    $result = $selectStmt->get_result();
+    $specData = $result->fetch_assoc();
+    $selectStmt->close();
+
     $response = new ApiResponse(true, 'Спеціальність успішно оновлено');
-    $response->setData(['id' => $spec_id]);
+    $response->setData($specData);
 
 } catch (Exception $e) {
     $response = new ApiResponse(false, $e->getMessage());

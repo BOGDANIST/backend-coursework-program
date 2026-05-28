@@ -17,7 +17,8 @@ try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         throw new Exception('Метод не підтримується');
     }
-
+    //провірка
+    //throw new Exception('$_POST: ' . print_r($_POST, true));
     if (empty($_POST['id'])) {
         throw new Exception('ID студента не вказано');
     }
@@ -58,6 +59,25 @@ try {
     $shahter = !empty($_POST['form_shahter']) ? 'Так' : 'Ні';
     $vip = !empty($_POST['form_vip']) ? 'Так' : 'Ні';
 
+    // Підготовка змінних для bind_param
+    $form_group = $_POST['form_group'] ?? '';
+    $form_pr_stud = $_POST['form_pr_stud'] ?? '';
+    $form_im_stud = $_POST['form_im_stud'] ?? '';
+    $form_bat_stud = $_POST['form_bat_stud'] ?? '';
+    $form_sex = $_POST['form_sex'] ?? '';
+    $form_zamovl = $_POST['form_zamovl'] ?? '';
+    $form_date_nar = $_POST['form_date_nar'] ?? '';
+    $form_adres = $_POST['form_adres'] ?? '';
+    $form_tel_st = $_POST['form_tel_st'] ?? '';
+    $form_tel_bat = $_POST['form_tel_bat'] ?? '';
+    $form_tel_mut = $_POST['form_tel_mut'] ?? '';
+    $form_osvita = $_POST['form_osvita'] ?? '';
+    $form_zscool = $_POST['form_zscool'] ?? '';
+    $form_region_type = $_POST['form_region_type'] ?? '';
+    $form_region = $_POST['form_region'] ?? '';
+    $form_galuz = $_POST['form_galuz'] ?? '';
+    $form_spec = $_POST['form_spec'] ?? '';
+
     // Підготовлений запит
     $stmt = $linc->prepare("UPDATE student SET
         s_group = ?, s_pr = ?, s_im = ?, s_bat = ?, s_stat = ?, s_contract = ?,
@@ -73,25 +93,25 @@ try {
     }
 
     $stmt->bind_param(
-        'sssssssissssssssssssssssssi',
-        $_POST['form_group'],
-        $_POST['form_pr_stud'],
-        $_POST['form_im_stud'],
-        $_POST['form_bat_stud'],
-        $_POST['form_sex'] ?? '',
-        $_POST['form_zamovl'] ?? '',
-        $_POST['form_date_nar'] ?? '',
+        'ssssssssssssssssssssssssssssss',
+        $form_group,
+        $form_pr_stud,
+        $form_im_stud,
+        $form_bat_stud,
+        $form_sex,
+        $form_zamovl,
+        $form_date_nar,
         $vik,
-        $_POST['form_adres'] ?? '',
-        $_POST['form_tel_st'] ?? '',
-        $_POST['form_tel_bat'] ?? '',
-        $_POST['form_tel_mut'] ?? '',
-        $_POST['form_osvita'] ?? '',
-        $_POST['form_zscool'] ?? '',
-        $_POST['form_region_type'] ?? '',
-        $_POST['form_region'] ?? '',
-        $_POST['form_galuz'] ?? '',
-        $_POST['form_spec'] ?? '',
+        $form_adres,
+        $form_tel_st,
+        $form_tel_bat,
+        $form_tel_mut,
+        $form_osvita,
+        $form_zscool,
+        $form_region_type,
+        $form_region,
+        $form_galuz,
+        $form_spec,
         $sirot,
         $peres,
         $ivalid,
@@ -110,8 +130,19 @@ try {
         throw new Exception('Помилка при оновленні студента: ' . $stmt->error);
     }
 
+    // Fetch updated student data to return to client
+    $selectStmt = $linc->prepare("SELECT * FROM student WHERE s_id = ?");
+    if (!$selectStmt) {
+        throw new Exception('Помилка при отриманні даних: ' . $linc->error);
+    }
+    $selectStmt->bind_param('i', $student_id);
+    $selectStmt->execute();
+    $result = $selectStmt->get_result();
+    $studentData = $result->fetch_assoc();
+    $selectStmt->close();
+
     $response = new ApiResponse(true, 'Студента успішно оновлено');
-    $response->setData(['id' => $student_id]);
+    $response->setData($studentData);
 
 } catch (Exception $e) {
     $response = new ApiResponse(false, $e->getMessage());

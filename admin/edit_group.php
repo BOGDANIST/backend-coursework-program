@@ -216,10 +216,11 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
     <!-- Template CSS -->
     <link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
+            <link rel="stylesheet" href="assets/css/toast-notifications.css" rel="stylesheet">
+
     <!-- Google Fonts-->
     <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-        <script src="assets/js/toast-notifications.js"></script>
-              <link rel="stylesheet" href="assets/css/toast-notifications.css">
+
     <style>
         .fakeimg {
             height: 200px;
@@ -253,10 +254,18 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <?php include("../include/adm_menu.php"); ?>
     <?php include("../include/background_icon.php"); ?>
 
+    <!-- End Top Menu -->
 
+
+    <!-- Portfolio -->
     <div id="portfolio" class="bottom-border-shadow">
 
         <div class="container bottom-border">
+
+            <!-- End Portfolio -->
+
+            <!-- === END CONTENT === -->
+            <!-- === BEGIN FOOTER === -->
             <div id="base">
                 <div id="content">
                     <div class="container background-white" style="margin:0px; padding:10px;">
@@ -314,7 +323,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 								</select>
 								
 								<label><strong>Спеціалізація</strong></label>
-								 <input type="text" class="form-control" name="form_sz value="' . $row['g_specz'] . '" style="background:white; color:#0c0e0c; border:none;" >
+								 <input type="text" class="form-control" name="form_sz" value="' . $row['g_specz'] . '" style="background:white; color:#0c0e0c; border:none;" >
 								<select class="form-control" name="g_sz" id="sel4" size="6" style="color:#0c0e0c;">
 								<option value=""></option>
 								<option value="Ливарне виробництво чорних і кольорових металів і сплавів">Ливарне виробництво чорних і кольорових металів і сплавів</option>
@@ -411,6 +420,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                                         </div>
                                     </div>
                                 </div>
+
+
+
                             </div>
                         </div>
                     </div>
@@ -418,12 +430,12 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
 
 
-            
+                <!-- End Sample Menu -->
             </div>
         </div>
     </div>
 
-
+    <!-- Footer -->
     <!-- Footer -->
     <?php include("../include/footer.php"); ?>
 
@@ -431,7 +443,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <!-- Toast Notifications Container -->
     <div id="toast-container"></div>
 
-
+ 
     <!-- <script type="text/javascript" src="assets/js/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="assets/js/scripts.js"></script>
@@ -448,9 +460,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     // Modernizr 
     <script src="assets/js/modernizr.custom.js" type="text/javascript"></script>-->
     <!-- Toast Notifications -->
-
-        <script src="async.js"></script>
-
+    <script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+    <!-- Async Router -->
+    <script type="text/javascript" src="async.js" type="text/javascript"></script>
 
     <body>
 
