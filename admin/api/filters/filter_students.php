@@ -14,7 +14,10 @@ error_reporting(0);
 
 try {
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $limit = isset($_GET['limit']) ? in_array((int)$_GET['limit'], [10, 25, 50, 100]) ? (int)$_GET['limit'] : 50 : 50;
+    $limit = isset($_GET['limit']) ? in_array((int)$_GET['limit'], [10, 25, 50, 100]) ? (int)$_GET['limit'] : 50 : 50 ;
+    if(isset($_GET['limit']) && ($_GET['limit']=='all')){
+        $limit = 1000000;
+    }
     $offset = ($page - 1) * $limit;
 
     // Build query from filters
@@ -33,33 +36,38 @@ try {
 
     // Fields of knowledge
     $check_gz = $_POST['check_gz'] ?? [];
-    if (empty($check_gz)) {
-        $gz_query = "SELECT DISTINCT s_galuz FROM student ORDER BY s_galuz ASC";
-        $result = mysqli_query($linc, $gz_query);
-        while ($row = mysqli_fetch_assoc($result)) {
-            $check_gz[] = $row['s_galuz'];
-        }
-    }
+    // if (empty($check_gz)) {
+    //     $gz_query = "SELECT DISTINCT s_galuz FROM student ORDER BY s_galuz ASC";
+    //     $result = mysqli_query($linc, $gz_query);
+    //     while ($row = mysqli_fetch_assoc($result)) {
+    //         $check_gz[] = $row['s_galuz'];
+    //     }
+    // }
 
     if (!empty($check_gz)) {
-        $escaped_gz = array_map(function($v) use ($linc) {
+        $escaped_gz = array_map(function ($v) use ($linc) {
             return "'" . mysqli_real_escape_string($linc, $v) . "'";
         }, $check_gz);
         $query_all .= " AND s_galuz IN(" . implode(',', $escaped_gz) . ")";
     }
 
-    // Specialties
-    $check_sp = $_POST['check_sp'] ?? [];
-    if (empty($check_sp)) {
-        $spec_query = "SELECT DISTINCT im_spec FROM spec ORDER BY id_spec ASC";
-        $result = mysqli_query($linc, $spec_query);
-        while ($row = mysqli_fetch_assoc($result)) {
-            $check_sp[] = $row['im_spec'];
-        }
+//PIB
+    if (!empty($_POST['s_pib'])) {
+        $query_all .= " AND s_pr = '".$_POST['s_pib']."'  OR s_im = '".$_POST['s_pib']."' OR s_bat = '".$_POST['s_pib']."'";
     }
 
+    // Specialties
+    $check_sp = $_POST['check_sp'] ?? [];
+    // if (empty($check_sp)) {
+    //     $spec_query = "SELECT DISTINCT im_spec FROM spec ORDER BY id_spec ASC";
+    //     $result = mysqli_query($linc, $spec_query);
+    //     while ($row = mysqli_fetch_assoc($result)) {
+    //         $check_sp[] = $row['im_spec'];
+    //     }
+    // }
+
     if (!empty($check_sp)) {
-        $escaped_sp = array_map(function($v) use ($linc) {
+        $escaped_sp = array_map(function ($v) use ($linc) {
             return "'" . mysqli_real_escape_string($linc, $v) . "'";
         }, $check_sp);
         $query_all .= " AND s_spec IN(" . implode(',', $escaped_sp) . ")";
@@ -199,14 +207,12 @@ try {
         $students[] = $row;
     }
 
-    $response = new ApiResponse(true, "Знайдено $total студентів");
-    //$response = new ApiResponse(true, "$data_query");
+    //$response = new ApiResponse(true, "Знайдено $total студентів");
+    $response = new ApiResponse(true, $_GET);
     $response->setData($students);
     $response->setPagination($total, $page, $limit);
     $response->send();
-
 } catch (Exception $e) {
     $response = new ApiResponse(false, $e->getMessage());
     $response->send();
 }
-?>

@@ -512,6 +512,7 @@ else
             const clearBtn = document.getElementById('clear-filter');
             const form = document.getElementById('filter-form');
 
+			 AsyncRouter.filterOldStudents(form, 1, document.getElementById('limit') ? document.getElementById('limit').value : 50);
             // Submit filter
             if (submitBtn) {
                 submitBtn.addEventListener('click', function(e) {
@@ -531,6 +532,8 @@ else
                     const pag = document.getElementById('pagination-container');
                     if (pag) pag.innerHTML = '';
                     ToastNotification.info('Фільтри очищені');
+
+					 AsyncRouter.filterOldStudents(form, 1, document.getElementById('limit') ? document.getElementById('limit').value : 50);
                 });
             }
 

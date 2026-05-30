@@ -8,6 +8,7 @@ if (!in_array($_SESSION['auth_user'] ?? '', ['admin', 'editor'])) {
 }
 
 include '../../../include/db_connect.php';
+
 include '../ApiResponse.php';
 
 $response = new ApiResponse(false, 'Невідома помилка');
@@ -22,7 +23,7 @@ try {
     if (empty($_POST['id'])) {
         throw new Exception('ID студента не вказано');
     }
-
+ //throw new Exception(print_r($_POST));
     $student_id = (int)$_POST['id'];
 
     // Валідація обов'язкових полів
@@ -49,7 +50,7 @@ try {
     // Обробка чекбоксів
     $sirot = !empty($_POST['form_sirot']) ? 'Так' : 'Ні';
     $peres = !empty($_POST['form_peres']) ? 'Так' : 'Ні';
-    $ivalid = !empty($_POST['form_ivalid']) ? 'Так' : 'Ні';
+    $ivalid = $_POST['form_ivalid'] ?? $_POST['s_inval'] ?? 'Ні';
     $malozab = !empty($_POST['form_malozab']) ? 'Так' : 'Ні';
     $uchbd = !empty($_POST['form_uchbd']) ? 'Так' : 'Ні';
     $chernob = !empty($_POST['form_chernob']) ? 'Так' : 'Ні';
@@ -65,16 +66,16 @@ try {
     $form_im_stud = $_POST['form_im_stud'] ?? '';
     $form_bat_stud = $_POST['form_bat_stud'] ?? '';
     $form_sex = $_POST['form_sex'] ?? '';
-    $form_zamovl = $_POST['form_zamovl'] ?? '';
+    $form_zamovl = $_POST['form_zamovl'] ?? $_POST['form_zamovl_stud'] ??'';
     $form_date_nar = $_POST['form_date_nar'] ?? '';
     $form_adres = $_POST['form_adres'] ?? '';
     $form_tel_st = $_POST['form_tel_st'] ?? '';
     $form_tel_bat = $_POST['form_tel_bat'] ?? '';
     $form_tel_mut = $_POST['form_tel_mut'] ?? '';
-    $form_osvita = $_POST['form_osvita'] ?? '';
+    $form_osvita = $_POST['form_osvita'] ?? $_POST['form_osvita_stud'] ?? '';
     $form_zscool = $_POST['form_zscool'] ?? '';
-    $form_region_type = $_POST['form_region_type'] ?? '';
-    $form_region = $_POST['form_region'] ?? '';
+    $form_region_type = $_POST['form_reg_type'] ?? $_POST['form_reg_type_stud'] ?? '';
+    $form_region = $_POST['form_region'] ?? $_POST['form_region_stud'] ??'';
     $form_galuz = $_POST['form_galuz'] ?? '';
     $form_spec = $_POST['form_spec'] ?? '';
 
@@ -141,7 +142,7 @@ try {
     $studentData = $result->fetch_assoc();
     $selectStmt->close();
 
-    $response = new ApiResponse(true, 'Студента успішно оновлено');
+    $response = new ApiResponse(true, $_POST);
     $response->setData($studentData);
 
 } catch (Exception $e) {

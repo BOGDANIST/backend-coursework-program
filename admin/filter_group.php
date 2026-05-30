@@ -9,6 +9,7 @@ session_start();
 else
 	{
 	include ("../include/db_connect.php");
+	
 	error_reporting(0);
 	
 	echo '
@@ -142,7 +143,7 @@ else
 															<strong>' . htmlspecialchars($config['title']) . ':</strong>
 														</h3>
 														<div class="col-md-12">
-															<table class="table table-primary rounded-1 table-striped d-flex table-layout: auto; table-responsive-md fs-3 fs-sm-1 d-flex ">';
+															<table class="table table-primary rounded-1 table-striped d-flex table-layout: auto; table-responsive-md justify-content-md-center fs-3 fs-sm-1 d-flex ">';
 														
 														$i = 1;
 														while ($row = mysqli_fetch_array($result_group1)) {

@@ -51,7 +51,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 			height: 200px;
 			background: #aaa;
 		}
-
 	</style>
 
 	</head>
@@ -110,7 +109,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 										if (mysqli_num_rows($result) > 0) {
 											$row = mysqli_fetch_array($result);
 											do {
-
+												//echo print_r($row, true);
 												echo '
                                <label><strong>Прізвище</strong></label>
 								<strong> <input type="text" class="form-control" name="form_pr_stud" value="' . $row['s_pr'] . '" style="background:white; color:#0c0e0c; border:none;"  ></strong>
@@ -203,32 +202,32 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 									  </select>
 
 
-									<label>Соціальна категорія</label>
-									 <div style="color:#0c0e0c; background:white; font-size: 14px; padding-left:15px; border-radius:5px;">
+									<label>Соціальна категория</label>
+									<div style="color:#0c0e0c; background:white; font-size: 14px; padding-left:15px; border-radius:5px;">
 										<div class="form-check">
-										  <label class="form-check-label">
-											<input type="checkbox" class="form-check-input" name="form_sirot" value="Так">Діти-сироти та діти позбавлені батьківського піклування
-										  </label>
+										<label class="form-check-label">
+											<input type="checkbox" class="form-check-input" name="form_sirot" value="Так" ' . (($row['s_sirota'] == 'Так') ? 'checked' : '') . '>Діти-сироти та діти позбавлені батьківського піклування
+										</label>
 										</div>
 										<div class="form-check">
-										  <label class="form-check-label">
-											<input type="checkbox" class="form-check-input" name="form_peres" value="Так">Переселенці
-										  </label>
+										<label class="form-check-label">
+											<input type="checkbox" class="form-check-input" name="form_peres" value="Так" ' . (($row['s_peresel'] == 'Так') ? 'checked' : '') . '>Переселенці
+										</label>
 										</div>
 										<div class="form-check">
-										  <label class="form-check-label">
-											<input type="checkbox" class="form-check-input" name="form_ivalid" value="Так">Інваліди
-										  </label>
+										<label class="form-check-label">
+											<input type="checkbox" class="form-check-input" name="form_ivalid" value="Так" ' . (($row['s_inval'] == 'Так') ? 'checked' : '') . '>Інваліди
+										</label>
 										</div>
 										<div class="form-check">
-										  <label class="form-check-label">
-											<input type="checkbox" class="form-check-input" name="form_malozab" value="Так">Малозабезпечені
-										  </label>
+										<label class="form-check-label">
+											<input type="checkbox" class="form-check-input" name="form_malozab" value="Так" ' . (($row['s_malozab'] == 'Так') ? 'checked' : '') . '>Малозабезпечені
+										</label>
 										</div>
 										<div class="form-check">
-										  <label class="form-check-label">
-											<input type="checkbox" class="form-check-input" name="form_uchbd" value="Так">Учасники бойових дій та їх діти
-										  </label>
+										<label class="form-check-label">
+											<input type="checkbox" class="form-check-input" name="form_uchbd" value="Так" ' . (($row['s_war_act'] == 'Так') ? 'checked' : '') . '>Учасники бойових дій та їх діти
+										</label>
 										</div>
 									</div>
 

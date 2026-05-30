@@ -14,6 +14,13 @@ const AsyncRouter = {
             const response = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
+                // localStorage.setItem('studentData', JSON.stringify(response.data));
+                try {
+                    //localStorage.setItem('studentData',  JSON.stringify(response.data));
+                    console.success('Good');
+                } catch (e) {
+                    console.warn('Could not save filters to localStorage:', e);
+                }
                 this.renderStudentTable(response.data, false);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
@@ -260,9 +267,9 @@ const AsyncRouter = {
     },
 
     async editGroup(groupId, formElement) {
-         
+
         try {
-            console.log('Editing group with data:',groupId);
+            console.log('Editing group with data:', groupId);
             const formData = new FormData(formElement);
             formData.append('id', groupId);
             //console.log('Editing group with data:');
@@ -301,7 +308,7 @@ const AsyncRouter = {
             'g_nastav': ['form_nast']
         };
 
-       // console.log('Updating group form fields with data:', groupData);
+        // console.log('Updating group form fields with data:', groupData);
         for (const [dbField, formFieldNames] of Object.entries(fieldMappings)) {
             if (groupData[dbField] !== undefined) {
                 const newValue = groupData[dbField] || '';
@@ -639,6 +646,7 @@ const AsyncRouter = {
     clearFiltersFromLocalStorage() {
         try {
             localStorage.removeItem('studentFilters');
+
         } catch (e) {
             console.warn('Could not clear filters from localStorage:', e);
         }
@@ -701,24 +709,24 @@ const AsyncRouter = {
                     <td class="text-center">${this.escapeHtml(student.s_group)}</td>
                     <td class="text-center">${this.escapeHtml(student.s_cours)}</td>
                     `
-                    if (isOld) {
-                        html += `
+            if (isOld) {
+                html += `
                     <td class="d-flex justify-content-center border-0 gap-2">
                         <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a></td>
                     </tr>
                         `;
-                    } else {
-                        html += `
+            } else {
+                html += `
                     <td class="d-flex justify-content-center border-0 gap-2">
-                        <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a>
-                        <a href="edit_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-warning">Змінити</a>
+                        <a href="view_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a>
+                        <a href="edit_student.php?id_st=${student.s_id}" class="btn btn-sm btn-warning">Змінити</a>
                         <a href="#" onclick="AsyncRouter.deleteOldStudent(${student.s_id}); return false;" class="btn btn-sm btn-danger">Видалити</a>
                     </td>
                     </tr>
                          `;
-                    }
+            }
 
-    
+
         });
 
         html += `
@@ -877,11 +885,64 @@ const AsyncRouter = {
             "'": '&#039;'
         };
         return String(text).replace(/[&<>"']/g, m => map[m]);
+    },
+
+    async exportStudentsToExcel(formElement = null, page = 1, limit = 50) { // Додано async
+    try {
+        const form = formElement || document.getElementById('filter-form');
+        const filters = this.collectFilterData(form);
+
+        console.log('Applying filters:', filters);
+        
+        // 1. Отримуємо відфільтровані дані студентів
+        const responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
+            console.log('Data to export:', responseData.data);
+        if (responseData.success && responseData.data && responseData.data.length > 0) {
+            
+            // 2. Готуємо дані для PHP
+            const formData = new FormData();
+            formData.append('download_excel', 'yes');
+            formData.append('export_data', JSON.stringify(responseData.data)); // Передаємо самі дані
+
+            // Використовуємо нативний fetch, бо нам потрібен Blob (файл), а не JSON
+            const response = await fetch('api/export/export_excel.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Помилка генерації файлу');
+
+            // 3. Перетворюємо відповідь у файл та завантажуємо
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            
+            // Встановлюємо ім'я файлу (можна й без дати, PHP теж її віддає в заголовках)
+            const dateNow = new Date().toISOString().split('T')[0];
+            a.download = `Звіт_по_студентам_на_${dateNow}.xlsx`;
+            
+            document.body.appendChild(a);
+            a.click(); // Імітуємо клік для початку скачування
+            
+            // Очищуємо пам'ять
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+        } else {
+            ToastNotification.error(responseData.message || 'Немає даних для експорту');
+        }
+    } catch (error) {
+        console.error('Export error:', error);
+        ToastNotification.error('Помилка при експорті даних');
     }
+}
 };
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Load saved filters if on filter page
     const filterForm = document.getElementById('filter-form');
     if (filterForm) {
