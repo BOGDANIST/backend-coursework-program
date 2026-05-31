@@ -55,7 +55,7 @@ $result = mysqli_query($linc, $sql);
                 background: #aaa;
             }
         </style>
-        <link rel="stylesheet" href="../assets/css/toast-notifications.css" rel="stylesheet">
+        <link rel="stylesheet" href="assets/css/toast-notifications.css" rel="stylesheet">
     </head>
     <body>
     <div id="toast-container"></div>
@@ -132,5 +132,5 @@ $result = mysqli_query($linc, $sql);
     </body>
 </html>
 
-<script src="../assets/js/toast-notifications.js"></script>
-<script src="../async.js"></script>
+<script src="assets/js/toast-notifications.js"></script>
+<script src="async.js"></script>

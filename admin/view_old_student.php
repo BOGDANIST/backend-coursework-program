@@ -57,7 +57,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
 			}
 	</style>
 	
-        <link rel="stylesheet" href="../assets/css/toast-notifications.css" rel="stylesheet">
+        <link rel="stylesheet" href="assets/css/toast-notifications.css" rel="stylesheet">
 	</head>
    
       <div id="body-bg">
@@ -225,7 +225,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
  	<?php include ("../include/footer.php");?>
 
   
-	<script src="../assets/js/toast-notifications.js"></script>
-	<script src="../async.js"></script>
+		<script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+	<script src="async.js"></script>
  </body>
 </html>

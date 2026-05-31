@@ -338,9 +338,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
 		<!-- End Footer -->
 		<!-- JS -->
-		<script type="text/javascript" src="assets/js/jquery.min.js" type="text/javascript"></script>
-		<script type="text/javascript" src="assets/js/bootstrap.min.js" type="text/javascript"></script>
-		<script type="text/javascript" src="assets/js/scripts.js"></script>
+		<script type="text/javascript" src="../assets/js/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../assets/js/bootstrap.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../assets/js/scripts.js"></script>
 		<!-- Toast Notifications -->
 		<script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
 		<!-- Async Router -->

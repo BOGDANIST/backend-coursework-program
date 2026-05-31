@@ -18,6 +18,7 @@ try {
         throw new Exception('Метод не підтримується');
     }
 
+    //  throw new Exception(print_r($_POST));
     // Валідація обов'язкових полів
     if (empty($_POST['form_im_group'] ?? '')) {
         $errors['form_im_group'] = 'Назва групи обов\'язкова';
@@ -29,7 +30,7 @@ try {
     }
 
     // Перевірка дублювання
-    $check_stmt = $linc->prepare("SELECT g_id FROM st_group WHERE g_im = ? LIMIT 1");
+    $check_stmt = $linc->prepare("SELECT * FROM st_group WHERE g_im = ? LIMIT 1");
     if (!$check_stmt) {
         throw new Exception('Помилка перевірки: ' . $linc->error);
     }
@@ -54,19 +55,33 @@ try {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
     }
 
+    // 1. Виносимо всі значення в окремі змінні
+    $im_group = $_POST['form_im_group'];
+    $g_gz = $_POST['g_gz'] ?? '';
+    $g_sp = $_POST['g_sp'] ?? '';
+    $g_sz = $_POST['g_sz'] ?? '';
+    $g_kurs = $_POST['g_kurs'] ?? '';
+    $g_vip = $_POST['g_vip'] ?? '';
+    $g_count_stud = $_POST['g_count_stud'] ?? 0;
+    $g_count_rz = $_POST['g_count_rz'] ?? 0;
+    $g_count_contr = $_POST['g_count_contr'] ?? 0;
+    $g_nast = $_POST['g_nast'] ?? '';
+    $g_fn = $_POST['g_fn'] ?? '';
+
+    // 2. Передаємо готові змінні у підготовлений запит
     $stmt->bind_param(
-        'ssssssiiiis',
-        $_POST['form_im_group'],
-        $_POST['g_gz'] ?? '',
-        $_POST['g_sp'] ?? '',
-        $_POST['g_sz'] ?? '',
-        $_POST['g_kurs'] ?? '',
-        $_POST['g_vip'] ?? '',
-        $_POST['g_count_stud'] ?? 0,
-        $_POST['g_count_rz'] ?? 0,
-        $_POST['g_count_contr'] ?? 0,
-        $_POST['g_nast'] ?? '',
-        $_POST['g_fn'] ?? ''
+        'sssssssiiis',
+        $im_group,
+        $g_gz,
+        $g_sp,
+        $g_sz,
+        $g_kurs,
+        $g_vip,
+        $g_count_stud,
+        $g_count_rz,
+        $g_count_contr,
+        $g_nast,
+        $g_fn
     );
 
     if (!$stmt->execute()) {

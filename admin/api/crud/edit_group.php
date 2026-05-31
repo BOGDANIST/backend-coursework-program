@@ -10,6 +10,7 @@ if (!in_array($_SESSION['auth_user'] ?? '', ['admin', 'editor'])) {
 include '../../../include/db_connect.php';
 include '../ApiResponse.php';
 //include '../assets/midllware.php';
+
 $response = new ApiResponse(false, 'Невідома помилка');
 $errors = [];
 
@@ -18,13 +19,11 @@ try {
         throw new Exception('Метод не підтримується');
     }
 
-    //  throw new Exception('$_POST: ' . print_r($_POST));
-
     if (empty($_POST['id'])) {
         throw new Exception('ID групи не вказано');
     }
 
-    // ID групи - це СТАРА назва групи (перед редаванням)
+    // ID групи - це СТАРА назва групи (перед редагуванням)
     $group_id_old = $_POST['id'];
 
     if (empty($_POST['form_im_group'] ?? '')) {
@@ -36,7 +35,7 @@ try {
         throw new Exception('Помилки валідації');
     }
 
-    // Перша перевірка: отримуємо реальний ID групи по старій назві
+    // Перша перевірка: отримуємо реальний запис групи по старій назві
     $checkStmt = $linc->prepare("SELECT * FROM st_group WHERE g_im = ? LIMIT 1");
     if (!$checkStmt) {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
@@ -51,7 +50,7 @@ try {
         throw new Exception('Група не знайдена');
     }
 
-    // Prepare variables because bind_param requires variables (not expressions)
+    // Збираємо змінні для bind_param
     $g_im = $_POST['form_im_group'];
     $g_gz = $_POST['g_gz'] ?? $_POST['form_gz'] ?? '';
     $g_sp = $_POST['g_sp'] ?? $_POST['form_sp'] ?? '';
@@ -64,8 +63,7 @@ try {
     $g_nast = $_POST['g_nast'] ?? $_POST['form_nast'] ?? '';
     $g_fn = $_POST['g_fn'] ?? $_POST['form_fn'] ?? '';
 
-
-    // ВАЖЛИВО: оновлюємо ТІЛЬКИ групу, що має старе ім'я
+    // 1. ОНОВЛЮЄМО САМУ ГРУПУ
     $stmt = $linc->prepare("UPDATE st_group SET
          g_im = ?, g_galuz = ?, g_spec = ?, g_specz = ?, g_course = ?,
         g_vipusc = ?, g_count_stud = ?, g_count_derg = ?, g_count_comerc = ?,
@@ -73,7 +71,7 @@ try {
         WHERE g_im = ?");
 
     if (!$stmt) {
-        throw new Exception('Помилка підготовки запиту: ' . $linc->error);
+        throw new Exception('Помилка підготовки запиту для групи: ' . $linc->error);
     }
 
     $stmt->bind_param(
@@ -92,14 +90,46 @@ try {
         $group_id_old
     );
 
-    // Debug: виведення запиту перед виконанням
-    // error_log('SQL Query: ' . $stmt->query);
-
     if (!$stmt->execute()) {
         throw new Exception('Помилка при оновленні групи: ' . $stmt->error);
     }
+    $stmt->close();
 
-    // Fetch updated group data to return to client (використовуємо НОВУ назву)
+
+    // 2. ОНОВЛЮЄМО ВСІХ СТУДЕНТІВ ЦІЄЇ ГРУПИ
+    $updateStudentsStmt = $linc->prepare("UPDATE student SET 
+        s_group = ?, 
+        s_galuz = ?, 
+        s_spec = ?, 
+        s_specz = ?, 
+        s_cours = ?, 
+        s_vip = ?, 
+        s_form_navch = ? 
+        WHERE s_group = ?");
+
+    if (!$updateStudentsStmt) {
+        throw new Exception('Помилка підготовки запиту для студентів: ' . $linc->error);
+    }
+
+    $updateStudentsStmt->bind_param(
+        'ssssisss', // 'i' для курсу, решта - 's' (рядки)
+        $g_im,
+        $g_gz,
+        $g_sp,
+        $g_sz,
+        $g_kurs,
+        $g_vipusc,
+        $g_fn,
+        $group_id_old
+    );
+
+    if (!$updateStudentsStmt->execute()) {
+        throw new Exception('Помилка при оновленні даних студентів: ' . $updateStudentsStmt->error);
+    }
+    $updateStudentsStmt->close();
+
+
+    // 3. ОТРИМУЄМО ОНОВЛЕНІ ДАНІ ГРУПИ ДЛЯ ФРОНТЕНДУ
     $selectStmt = $linc->prepare("SELECT * FROM st_group WHERE g_im = ? LIMIT 1");
     if (!$selectStmt) {
         throw new Exception('Помилка при отриманні даних: ' . $linc->error);
@@ -110,7 +140,7 @@ try {
     $groupData = $result->fetch_assoc();
     $selectStmt->close();
 
-    $response = new ApiResponse(true, 'Групу успішно оновлено');
+    $response = new ApiResponse(true, 'Групу та всіх прив\'язаних студентів успішно оновлено');
     $response->setData($groupData);
 
 } catch (Exception $e) {

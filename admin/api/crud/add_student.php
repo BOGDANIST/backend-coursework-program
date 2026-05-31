@@ -64,27 +64,73 @@ try {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
     }
 
+  // 1. Спочатку отримуємо назву групи з $_POST
+$form_group = $_POST['form_group'];
+
+// 2. Ініціалізуємо змінні порожніми значеннями на випадок помилки
+$form_galuz       = '';
+$form_spec        = '';
+$form_specz       = '';
+$form_form_navch  = '';
+$form_cours       = '';
+
+// 3. Робимо безпечний запит до таблиці груп (st_group), щоб витягнути дані цієї групи
+$stmt_group = $linc->prepare("SELECT g_galuz, g_spec, g_specz, g_formnavch, g_course FROM st_group WHERE g_im = ?");
+if ($stmt_group) {
+    $stmt_group->bind_param('s', $form_group);
+    $stmt_group->execute();
+    $result_group = $stmt_group->get_result();
+
+    // Якщо таку групу знайдено в базі
+    if ($row_group = $result_group->fetch_assoc()) {
+        $form_galuz       = $row_group['g_galuz'];
+        $form_spec        = $row_group['g_spec'];
+        $form_specz       = $row_group['g_specz'];
+        $form_form_navch  = $row_group['g_formnavch'];
+        $form_cours       = $row_group['g_course'];
+    }
+    $stmt_group->close();
+} else {
+    throw new Exception('Помилка підготовки запиту до таблиці груп: ' . $linc->error);
+}
+
+// 4. Всі інші поля беремо з $_POST, як і раніше
+$form_pr_stud     = $_POST['form_pr_stud'];
+$form_im_stud     = $_POST['form_im_stud'];
+$form_bat_stud    = $_POST['form_bat_stud'];
+$form_sex         = $_POST['form_sex'] ?? '';
+$form_zamovl      = $_POST['form_zamovl'] ?? '';
+$form_date_nar    = $_POST['form_date_nar'] ?? '';
+$form_adres       = $_POST['form_adres'] ?? '';
+$form_tel_st      = $_POST['form_tel_st'] ?? '';
+$form_tel_bat     = $_POST['form_tel_bat'] ?? '';
+$form_tel_mut     = $_POST['form_tel_mut'] ?? '';
+$form_osvita      = $_POST['form_osvita'] ?? '';
+$form_zscool      = $_POST['form_zscool'] ?? '';
+$form_region_type = $_POST['form_region_type'] ?? '';
+$form_region      = $_POST['form_region'] ?? '';
+    // 2. Передаємо змінні у bind_param (тепер тут рівно 29 символів і 29 параметрів)
     $stmt->bind_param(
-        'sssssssisssssssssssssssssss',
-        $_POST['form_group'],
-        $_POST['form_pr_stud'],
-        $_POST['form_im_stud'],
-        $_POST['form_bat_stud'],
-        $_POST['form_sex'] ?? '',
-        $_POST['form_zamovl'] ?? '',
-        $_POST['form_date_nar'] ?? '',
-        $vik,
-        $_POST['form_adres'] ?? '',
-        $_POST['form_tel_st'] ?? '',
-        $_POST['form_tel_bat'] ?? '',
-        $_POST['form_tel_mut'] ?? '',
-        $_POST['form_osvita'] ?? '',
-        $_POST['form_zscool'] ?? '',
-        $_POST['form_region_type'] ?? '',
-        $_POST['form_region'] ?? '',
-        $_POST['form_galuz'] ?? '',
-        $_POST['form_spec'] ?? '',
-        $sirot,
+        'sssssssisssssssssssssssssssss',
+        $form_group,
+        $form_pr_stud,
+        $form_im_stud,
+        $form_bat_stud,
+        $form_sex,
+        $form_zamovl,
+        $form_date_nar,
+        $vik,                // Змінна, яка вже була оголошена раніше
+        $form_adres,
+        $form_tel_st,
+        $form_tel_bat,
+        $form_tel_mut,
+        $form_osvita,
+        $form_zscool,
+        $form_region_type,
+        $form_region,
+        $form_galuz,
+        $form_spec,
+        $sirot,              // Змінні з чекбоксів, які вже були оголошені
         $peres,
         $ivalid,
         $malozab,

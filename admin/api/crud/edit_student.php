@@ -47,6 +47,38 @@ try {
         $vik = $interval->y;
     }
 
+
+      // 1. Спочатку отримуємо назву групи з $_POST
+$form_group = $_POST['form_group'];
+
+// 2. Ініціалізуємо змінні порожніми значеннями на випадок помилки
+$form_galuz       = '';
+$form_spec        = '';
+$form_specz       = '';
+$form_form_navch  = '';
+$form_cours       = '';
+
+// 3. Робимо безпечний запит до таблиці груп (st_group), щоб витягнути дані цієї групи
+$stmt_group = $linc->prepare("SELECT g_galuz, g_spec, g_specz, g_formnavch, g_course FROM st_group WHERE g_im = ?");
+if ($stmt_group) {
+    $stmt_group->bind_param('s', $form_group);
+    $stmt_group->execute();
+    $result_group = $stmt_group->get_result();
+
+    // Якщо таку групу знайдено в базі
+    if ($row_group = $result_group->fetch_assoc()) {
+        $form_galuz       = $row_group['g_galuz'];
+        $form_spec        = $row_group['g_spec'];
+        $form_specz       = $row_group['g_specz'];
+        $form_form_navch  = $row_group['g_formnavch'];
+        $form_cours       = $row_group['g_course'];
+    }
+    $stmt_group->close();
+} else {
+    throw new Exception('Помилка підготовки запиту до таблиці груп: ' . $linc->error);
+}
+
+
     // Обробка чекбоксів
     $sirot = !empty($_POST['form_sirot']) ? 'Так' : 'Ні';
     $peres = !empty($_POST['form_peres']) ? 'Так' : 'Ні';
@@ -76,17 +108,18 @@ try {
     $form_zscool = $_POST['form_zscool'] ?? '';
     $form_region_type = $_POST['form_reg_type'] ?? $_POST['form_reg_type_stud'] ?? '';
     $form_region = $_POST['form_region'] ?? $_POST['form_region_stud'] ??'';
-    $form_galuz = $_POST['form_galuz'] ?? '';
-    $form_spec = $_POST['form_spec'] ?? '';
+    // $form_galuz = $_POST['form_galuz'] ?? '';
+    // $form_spec = $_POST['form_spec'] ?? '';
 
+    
     // Підготовлений запит
     $stmt = $linc->prepare("UPDATE student SET
         s_group = ?, s_pr = ?, s_im = ?, s_bat = ?, s_stat = ?, s_contract = ?,
         s_dnar = ?, s_vik = ?, s_adresa = ?, s_tels = ?, s_telb = ?, s_telm = ?,
         s_osvita_type = ?, s_rik_zaver = ?, s_region_type = ?, s_region = ?,
-        s_galuz = ?, s_spec = ?, s_sirota = ?, s_peresel = ?, s_inval = ?,
+        s_galuz = ?, s_spec = ?, s_specz = ?, s_sirota = ?, s_peresel = ?, s_inval = ?,
         s_malozab = ?, s_war_act = ?, s_chernob = ?, s_ato = ?, s_ditzag = ?,
-        s_rada = ?, s_shahter = ?, s_vip = ?
+        s_rada = ?, s_shahter = ?, s_vip = ?, s_cours= ?, s_form_navch = ?
         WHERE s_id = ?");
 
     if (!$stmt) {
@@ -94,7 +127,7 @@ try {
     }
 
     $stmt->bind_param(
-        'ssssssssssssssssssssssssssssss',
+        'sssssssssssssssssssssssssssssssss',
         $form_group,
         $form_pr_stud,
         $form_im_stud,
@@ -113,6 +146,7 @@ try {
         $form_region,
         $form_galuz,
         $form_spec,
+        $form_specz,
         $sirot,
         $peres,
         $ivalid,
@@ -124,6 +158,8 @@ try {
         $rada,
         $shahter,
         $vip,
+        $form_cours,
+        $form_form_navch,
         $student_id
     );
 
