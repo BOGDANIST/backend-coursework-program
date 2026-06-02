@@ -207,8 +207,8 @@ try {
         $students[] = $row;
     }
 
-    //$response = new ApiResponse(true, "Знайдено $total студентів");
-    $response = new ApiResponse(true, $_GET);
+    $response = new ApiResponse(true, "Знайдено $total студентів");
+    //$response = new ApiResponse(true, "Дані успішно онолвено");
     $response->setData($students);
     $response->setPagination($total, $page, $limit);
     $response->send();

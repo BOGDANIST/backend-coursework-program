@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Перевірка доступу (тільки адмін може змінювати користувачів)
 if (!in_array($_SESSION['auth_user'] ?? '', ['admin'])) {
     header('HTTP/1.1 403 Forbidden');
     include __DIR__ . '/../ApiResponse.php';
@@ -24,14 +25,12 @@ try {
 
     $user_id = (int)$_POST['user_id'];
 
-    if (empty($_POST['old_password'] ?? '')) {
-        $errors['old_password'] = 'Старий пароль обов\'язковий';
-    }
-
+    // Перевірка, чи введено новий пароль
     if (empty($_POST['new_password1'] ?? '')) {
         $errors['new_password1'] = 'Новий пароль обов\'язковий';
     }
 
+    // Перевірка, чи збігаються новий пароль та підтвердження
     if (($_POST['new_password1'] ?? '') !== ($_POST['new_password2'] ?? '')) {
         $errors['new_password2'] = 'Паролі не збігаються';
     }
@@ -41,23 +40,7 @@ try {
         throw new Exception('Помилки валідації');
     }
 
-    // Перевірка старого пароля
-    $get_stmt = $linc->prepare("SELECT password FROM users WHERE user_id = ?");
-    if (!$get_stmt) {
-        throw new Exception('Помилка перевірки: ' . $linc->error);
-    }
-
-    $get_stmt->bind_param('i', $user_id);
-    $get_stmt->execute();
-    $get_stmt->bind_result($old_pwd);
-    $get_stmt->fetch();
-    $get_stmt->close();
-
-    if (md5($_POST['old_password']) !== $old_pwd) {
-        throw new Exception('Старий пароль невірний');
-    }
-
-    // Оновлення паролю та статусу
+    // Оновлення паролю та статусу (без перевірки старого пароля)
     $status_map = ['user' => '1', 'admin' => '10', 'editor' => '9', 'viewer' => '8'];
     $status = $status_map[$_POST['input_status'] ?? 'user'] ?? '1';
     $new_password = md5($_POST['new_password1']);
@@ -71,11 +54,10 @@ try {
     $stmt->bind_param('ssi', $new_password, $status, $user_id);
 
     if (!$stmt->execute()) {
-        throw new Exception('Помилка при оновленні користувача: ' . $stmt->error);
+        throw new Exception('Помилка при оновленні: ' . $stmt->error);
     }
 
-    $response = new ApiResponse(true, 'Користувача успішно оновлено');
-    $response->setData(['id' => $user_id]);
+    $response = new ApiResponse(true, 'Дані користувача успішно оновлено');
 
 } catch (Exception $e) {
     $response = new ApiResponse(false, $e->getMessage());

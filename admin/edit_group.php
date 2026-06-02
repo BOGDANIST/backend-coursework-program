@@ -282,91 +282,99 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                                                 ?>
                                             </strong></p>
                                     </div>
-                                    <?php
-                                    $result = mysqli_query($linc, "SELECT * FROM st_group WHERE g_im='$id_group'");
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $row = mysqli_fetch_array($result);
-                                        do {
+                                  <?php
+$result = mysqli_query($linc, "SELECT * FROM st_group WHERE g_im='$id_group'");
+if (mysqli_num_rows($result) > 0) {
+    
+    // 1. Збираємо всю таблицю spec у вигляді дерева (Галузь -> Спеціальності -> Спеціалізації)
+    $spec_tree = [];
+    $spec_query = "SELECT im_galuz, im_spec, im_specializ FROM spec";
+    $spec_result = mysqli_query($linc, $spec_query);
+    if ($spec_result) {
+        while ($r = mysqli_fetch_assoc($spec_result)) {
+            $g = trim($r['im_galuz']);
+            $s = trim($r['im_spec']);
+            $sz = trim($r['im_specializ']);
+            
+            if (!isset($spec_tree[$g])) $spec_tree[$g] = [];
+            if (!isset($spec_tree[$g][$s])) $spec_tree[$g][$s] = [];
+            if (!empty($sz) && !in_array($sz, $spec_tree[$g][$s])) {
+                $spec_tree[$g][$s][] = $sz;
+            }
+        }
+    }
+    // Перетворюємо дерево в JSON для JavaScript
+    $spec_json = json_encode($spec_tree, JSON_UNESCAPED_UNICODE);
 
-                                            echo '
-                               <label><strong>Назва групи</strong></label>
-								<strong> <input type="text" class="form-control" name="form_im_group" value="' . $row['g_im'] . '" style="background:white; color:#0c0e0c; border:none;"  ></strong>
-								
-								<label><strong><strong>Форма навчання</strong></label>
-								 <input type="text" class="form-control" name="form_fn" value="' . $row['g_formnavch'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-								<select class="form-control"  name="g_fn"   style="background:white; color:#0c0e0c;">
-									<option value="Денна">Денна</option>
-									<option value="Заочна">Заочна</option>
-								  </select> 
-								
-								<label><strong>Галузь знань</strong></label>
-								 <input type="text" class="form-control" name="form_gz" value="' . $row['g_galuz'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-								<select class="form-control" name="g_gz" id="sel2" size="6" style="color:#0c0e0c;">
-								<option value="01 Освіта">01 Освіта</option>
-								<option value="05 Соціальні і поведінкові науки">05 Соціальні і поведінкові науки</option>
-								<option value="07 Управління та адміністрування">07 Управління та адміністрування</option>
-								<option value="08 Право">08 Право</option>
-								<option value="12 Інформаційні технології">12 Інформаційні технології</option>
-								<option value="13 Механічна інженерія">13 Механічна інженерія</option>
-								</select>
-							
-								<label><strong>Спціальність</strong></label>
-								 <input type="text" class="form-control" name="form_sp" value="' . $row['g_spec'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-								<select class="form-control" name="g_sp" id="sel3" size="7" style="color:#0c0e0c;">
-								<option value="017 Фізична культура і спорт">017 Фізична культура і спорт</option>
-								<option value="051 Економіка">051 Економіка</option>
-								<option value="072 Фінанси, банківська справа та страхування">072 Фінанси, банківська справа та страхування</option>
-								<option value="081 Право">081 Право</option>
-								<option value="121 Інженерія програмного забезпечення">121 Інженерія програмного забезпечення</option>
-								<option value="133 Галузеве машинобудування">133 Галузеве машинобудування</option>
-								<option value="136 Металургія">136 Металургія</option>
-								</select>
-								
-								<label><strong>Спеціалізація</strong></label>
-								 <input type="text" class="form-control" name="form_sz" value="' . $row['g_specz'] . '" style="background:white; color:#0c0e0c; border:none;" >
-								<select class="form-control" name="g_sz" id="sel4" size="6" style="color:#0c0e0c;">
-								<option value=""></option>
-								<option value="Ливарне виробництво чорних і кольорових металів і сплавів">Ливарне виробництво чорних і кольорових металів і сплавів</option>
-								<option value="Художнє та ювелірне литво">Художнє та ювелірне литво</option>
-								<option value="Хімічне і нафтове машинобудуванняя">Хімічне і нафтове машинобудування</option>
-								<option value="Експлуатація та ремонт обладнання харчових виробництв">Експлуатація та ремонт обладнання харчових виробництв</option>
-								<option value="Технологія обробки матеріалів на верстатах та автоматичних лініях">Технологія обробки матеріалів на верстатах та автоматичних лініях/option>
-								<option value="Сучасні комп"ютерні технології в машинобудуванні">Сучасні комп"ютерні технології в машинобудуванні</option>
-								</select>
-								
-								<label><strong>Курс</strong></label>
-								<input type="text" class="form-control" name="form_cours" value="' . $row['g_course'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-									<select class="form-control" name="g_kurs" id="sel5" size="4" style="color:#0c0e0c;">
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									</select>
-									
-									<label><strong>Випускна група</strong></label>	
-									<input type="text" class="form-control" name="form_vp" value="' . $row['g_vipusc'] . '" style="background:white; color:#0c0e0c; border:none;"  >	  
-								  <select class="form-control"  name="g_vp" id="sel7" size="2" style="background:white; color:#0c0e0c;">
-									<option value="Так">Так</option>
-									<option value="Ні">Ні</option>
-								  </select> 
-								  
-									<label><strong>Кількість студентів</strong></label>
-									<input type="text" class="form-control" name="form_ks" value="' . $row['g_count_stud'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-								 
-									<label> <strong>Кількість студентів, що навчаються за регіональним замовленням</strong></label>
-								    <input type="text" class="form-control" name="form_ksd" value="' . $row['g_count_derg'] . '" style="background:white; color:#0c0e0c; border:none;"  >
-								  
-									<label> <strong>Кількість студентів, що навчаються за кошти фізичних або юридичних осіб</strong></label>
-								    <input type="text" class="form-control" name="form_ksk" value="' . $row['g_count_comerc'] . '" style="background:white; color:#0c0e0c; border:none;"  >
+    $row = mysqli_fetch_array($result);
+    do {
+        // Отримуємо поточні значення групи з бази даних
+        $current_gz = htmlspecialchars($row['g_galuz'] ?? '');
+        $current_sp = htmlspecialchars($row['g_spec'] ?? '');
+        $current_sz = htmlspecialchars($row['g_specz'] ?? '');
 
-									<label>Наставник групи</label>	
-									<input type="text" class="form-control" name="form_nast" value="' . $row['g_nastav'] . '" style="background:white; color:#0c0e0c; border:none;"  >	  
-								 ';
-                                        }
+        // Формуємо опції тільки для Галузі (інші селектори заповнить JS)
+        $gz_options = '<option value="">-- Оберіть галузь --</option>';
+        foreach ($spec_tree as $galuz => $specs) {
+            $selected = ($galuz == $current_gz) ? 'selected' : '';
+            $gz_options .= '<option value="'.htmlspecialchars($galuz).'" '.$selected.'>'.htmlspecialchars($galuz).'</option>';
+        }
 
-                                        while ($row = mysqli_fetch_array($result));
-                                    }
-                                    ?>
+        // 2. Виводимо форму (зайві input-и прибрано, id для JS додано)
+        echo '
+        <label><strong>Назва групи</strong></label>
+        <strong> <input type="text" class="form-control" name="form_im_group" value="' . htmlspecialchars($row['g_im']) . '" style="background:white; color:#0c0e0c; border:none;" required></strong>
+        
+        <label><strong>Форма навчання</strong></label>
+        <select class="form-control" name="g_fn" style="background:white; color:#0c0e0c;">
+            <option value="Денна" '.(($row['g_formnavch'] == 'Денна') ? 'selected' : '').'>Денна</option>
+            <option value="Заочна" '.(($row['g_formnavch'] == 'Заочна') ? 'selected' : '').'>Заочна</option>
+        </select> 
+        
+        <label><strong>Галузь знань</strong></label>
+        <select class="form-control" name="g_gz" id="sel_galuz" size="6" style="color:#0c0e0c;" required>
+            ' . $gz_options . '
+        </select>
+    
+        <label><strong>Спеціальність</strong></label>
+        <select class="form-control" name="g_sp" id="sel_spec" size="7" style="color:#0c0e0c;" disabled required>
+            <option value="">-- Спочатку оберіть галузь --</option>
+        </select>
+        
+        <label><strong>Спеціалізація</strong></label>
+        <select class="form-control" name="g_sz" id="sel_specz" size="6" style="color:#0c0e0c;" disabled>
+            <option value="">-- Спочатку оберіть спеціальність --</option>
+        </select>
+        
+        <label><strong>Курс</strong></label>
+        <select class="form-control" name="g_kurs" id="sel5" size="4" style="color:#0c0e0c;" required>
+            <option value="1" '.(($row['g_course'] == '1') ? 'selected' : '').'>1</option>
+            <option value="2" '.(($row['g_course'] == '2') ? 'selected' : '').'>2</option>
+            <option value="3" '.(($row['g_course'] == '3') ? 'selected' : '').'>3</option>
+            <option value="4" '.(($row['g_course'] == '4') ? 'selected' : '').'>4</option>
+        </select>
+        
+        <label><strong>Випускна група</strong></label>	  
+        <select class="form-control" name="g_vp" id="sel7" size="2" style="background:white; color:#0c0e0c;">
+            <option value="Так" '.(($row['g_vipusc'] == 'Так') ? 'selected' : '').'>Так</option>
+            <option value="Ні" '.(($row['g_vipusc'] == 'Ні') ? 'selected' : '').'>Ні</option>
+        </select> 
+        
+        <label><strong>Кількість студентів</strong></label>
+        <input type="text" class="form-control" name="g_count_stud" value="' . htmlspecialchars($row['g_count_stud']) . '" style="background:white; color:#0c0e0c; border:none;">
+        
+        <label> <strong>Кількість студентів, що навчаються за регіональним замовленням</strong></label>
+        <input type="text" class="form-control" name="g_count_rz" value="' . htmlspecialchars($row['g_count_derg']) . '" style="background:white; color:#0c0e0c; border:none;">
+        
+        <label> <strong>Кількість студентів, що навчаються за кошти фізичних або юридичних осіб</strong></label>
+        <input type="text" class="form-control" name="g_count_contr" value="' . htmlspecialchars($row['g_count_comerc']) . '" style="background:white; color:#0c0e0c; border:none;">
+
+        <label>Наставник групи</label>	
+        <input type="text" class="form-control" name="g_nast" value="' . htmlspecialchars($row['g_nastav']) . '" style="background:white; color:#0c0e0c; border:none;">	  
+        ';
+    } while ($row = mysqli_fetch_array($result));
+}
+?>
 
 
                                     <p>
@@ -467,3 +475,91 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     <body>
 
 </html>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Отримуємо наше дерево галузей і спеціальностей з PHP
+    const specTree = <?= $spec_json ?? '{}' ?>;
+    
+    // 2. Отримуємо поточні значення групи з бази даних (для сторінки редагування)
+    const currentGaluz = "<?= $current_gz ?? '' ?>";
+    const currentSpec  = "<?= $current_sp ?? '' ?>";
+    const currentSpecz = "<?= $current_sz ?? '' ?>";
+
+    // 3. Знаходимо наші випадаючі списки на сторінці
+    const selGaluz = document.getElementById('sel_galuz');
+    const selSpec  = document.getElementById('sel_spec');
+    const selSpecz = document.getElementById('sel_specz');
+
+    if (!selGaluz || !selSpec || !selSpecz) return;
+
+    // Функція оновлення Спеціальностей (розблоковує поле)
+    function updateSpec(selectedGaluz, autoSelectSpec = '') {
+        selSpec.innerHTML = '<option value="">-- Оберіть спеціальність --</option>';
+        selSpecz.innerHTML = '<option value="">-- Спочатку оберіть спеціальність --</option>';
+        selSpecz.disabled = true; // Блокуємо спеціалізацію
+
+        // Якщо нічого не обрано, блокуємо і спеціальність
+        if (!selectedGaluz || !specTree[selectedGaluz]) {
+            selSpec.disabled = true;
+            selSpec.innerHTML = '<option value="">-- Спочатку оберіть галузь --</option>';
+            return;
+        }
+
+        // Розблоковуємо та заповнюємо
+        selSpec.disabled = false;
+        const specs = specTree[selectedGaluz];
+         selSpec.innerHTML = "";
+        for (const sp in specs) {
+            const isSelected = (sp === autoSelectSpec) ? 'selected' : '';
+            selSpec.innerHTML += `<option value="${sp}" ${isSelected}>${sp}</option>`;
+        }
+    }
+
+    // Функція оновлення Спеціалізацій (розблоковує поле)
+    function updateSpecz(selectedGaluz, selectedSpec, autoSelectSpecz = '') {
+        selSpecz.innerHTML = '<option value="">-- Оберіть спеціалізацію --</option>';
+        
+        if (!selectedGaluz || !selectedSpec || !specTree[selectedGaluz] || !specTree[selectedGaluz][selectedSpec]) {
+            selSpecz.disabled = true;
+            selSpecz.innerHTML = '<option value="">-- Спочатку оберіть спеціальність --</option>';
+            return;
+        }
+
+        const speczs = specTree[selectedGaluz][selectedSpec];
+        
+        // Якщо для цієї спеціальності взагалі не існує спеціалізацій
+        if (speczs.length == 0) {
+            selSpecz.innerHTML = '<option value="">-- Немає спеціалізацій --</option>';
+            selSpecz.disabled = true; // Залишаємо заблокованим
+            return;
+        }
+
+        // Розблоковуємо та заповнюємо
+        selSpecz.disabled = false;
+        selSpecz.innerHTML = ``;
+        speczs.forEach(sz => {
+            const isSelected = (sz === autoSelectSpecz) ? 'selected' : '';
+            selSpecz.innerHTML += `<option value="${sz}" ${isSelected}>${sz}</option>`;
+        });
+    }
+
+    // 4. Вішаємо слухачі подій (що робити, коли користувач клікає на список)
+    selGaluz.addEventListener('change', function() {
+        updateSpec(this.value); // Оновлюємо спеціальності
+    });
+
+    selSpec.addEventListener('change', function() {
+        updateSpecz(selGaluz.value, this.value); // Оновлюємо спеціалізації
+    });
+
+    // 5. Ініціалізація при завантаженні сторінки (щоб підтягнути дані з бази при редагуванні)
+    if (currentGaluz) {
+        updateSpec(currentGaluz, currentSpec);
+        if (currentSpec) {
+            updateSpecz(currentGaluz, currentSpec, currentSpecz);
+        }
+    }
+});
+</script>

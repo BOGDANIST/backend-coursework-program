@@ -47,7 +47,7 @@ else
 
         <!-- Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="../assets/css/toast-notifications.css" rel="stylesheet">
+                <link rel="stylesheet" href="assets/css/toast-notifications.css">
     
 	<style>
   .fakeimg {
@@ -191,8 +191,10 @@ else
  <body>
 </html>
 
-<script src="../assets/js/toast-notifications.js"></script>
-<script src="../async.js"></script>
+		<!-- Toast Notifications -->
+		<script type="text/javascript" src="assets/js/toast-notifications.js" type="text/javascript"></script>
+		<!-- Async Router -->
+		<script type="text/javascript" src="async.js" type="text/javascript"></script>
 
 <?php
 

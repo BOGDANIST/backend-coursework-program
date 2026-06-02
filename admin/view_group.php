@@ -96,6 +96,11 @@ $result = mysqli_query($linc, $sql);
                                         <th class="col-md-2 text-center align-middle">По батькові</th>
                                         <th class="col-md-2 text-center align-middle">Дата народження</th>
 										<th class="col-md-1 text-center align-middle">Перегляд</th>
+                                        ';
+                                        if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                                           echo '<th class="col-md-1 text-center align-middle">Редагування</th>';
+                                        }
+                                        echo '
                                     </tr>
                                 
 								  ';
@@ -107,6 +112,11 @@ $result = mysqli_query($linc, $sql);
                                         <td>' . htmlspecialchars($row['s_bat']) . '</td>
                                         <td>' . htmlspecialchars($row['s_dnar']) . '</td>
 										<td class="text-decoration-underline"> <a href="view_student.php?id_st=' . $row["s_id"] .  '">Перегляд</a> </td>
+                                        ';
+                                        if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                                           echo '<td class="text-decoration-underline"> <a href="edit_student.php?id_st=' . $row["s_id"] .  '">Редагувати</a> </td>';
+                                        }
+                                        echo '
                                       </tr>';
                             }
                             echo '	</table></div>';

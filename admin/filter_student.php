@@ -126,11 +126,11 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                                     <input class="col-9" type="text" name="s_pib" value="" style=width:80%; height: 25px;
                                         background:white; font-size: 15px;margin-top:5px; border:1px solid #cccccc;
                                         color:#030303; padding-left:10px; border-radius:10px; ">
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Вид замовлення -->
-                                    <div class=" dropdown dropdown-filter-wrapper mb-3">
+                                        <!-- Вид замовлення -->
+                                        <div class=" dropdown dropdown-filter-wrapper mb-3">
                                     <button
                                         class="btn btn-outline-secondary dropdown-toggle dropdown-filter-btn w-100 text-start"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#dropdownVzMenu"
@@ -509,23 +509,28 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
         <script src="async.js"></script>
 
         <script>
-
-
             document.addEventListener('DOMContentLoaded', function () {
                 const submitBtn = document.getElementById('submit-filter');
                 const clearBtn = document.getElementById('clear-filter');
                 const excelExport = document.getElementById('submit-excel-export');
                 const form = document.getElementById('filter-form');
 
+                // 1. Спочатку підтягуємо збережені фільтри з пам'яті (якщо вони є)
+                const savedFilters = AsyncRouter.loadFiltersFromLocalStorage();
+                if (savedFilters) {
+                    AsyncRouter.applyFiltersToForm(form, savedFilters);
+                }
 
+                // 2. Робимо ЄДИНИЙ стартовий виклик для завантаження таблиці
                 AsyncRouter.filterStudents(form, 1, document.getElementById('limit').value);
-                // Submit filter
+
+                // Обробник кнопки "Пошук"
                 submitBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     AsyncRouter.filterStudents(form, 1, document.getElementById('limit').value);
                 });
 
-                // Clear filters
+                // Обробник кнопки "Очистити"
                 clearBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     form.reset();
@@ -537,28 +542,14 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                     AsyncRouter.filterStudents(form, 1, document.getElementById('limit').value);
                 });
 
-
+                // Обробник експорту в Excel
                 if (excelExport && form) {
                     excelExport.addEventListener('click', function (e) {
-                        // 1. Зупиняємо стандартну відправку форми браузером
                         e.preventDefault();
-
-                        // 2. Зберігаємо поточні фільтри в localStorage (як у вас і було)
-                        // Переконайтеся, що метод приймає об'єкт форми або зберіть дані перед збереженням
                         const filters = AsyncRouter.collectFilterData(form);
                         AsyncRouter.saveFiltersToLocalStorage(filters);
-
-                        // 3. ВИКЛИКАЄМО метод генерації та скачування Excel файлу
                         AsyncRouter.exportStudentsToExcel(form);
                     });
-                }
-
-                // Load saved filters on page load
-                const savedFilters = AsyncRouter.loadFiltersFromLocalStorage();
-                if (savedFilters) {
-                    AsyncRouter.applyFiltersToForm(form, savedFilters);
-                    // Auto-apply filters
-                    AsyncRouter.filterStudents(form, 1, document.getElementById('limit').value);
                 }
             });
         </script>

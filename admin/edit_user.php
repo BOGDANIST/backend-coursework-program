@@ -130,15 +130,16 @@ else
 									while ($row = mysqli_fetch_array($result));
 									}
 								?>
-								<label >Підтвердіть старий пароль</label>
-								<input type="password" class="form-control" id="sel2"  name="old_password" style="background:white; color:#0c0e0c; border:none;"  > 
-								
 								<label >Введіть новий пароль</label>
-								<input type="password" class="form-control" id="sel3"  name="new_password" style="background:white; color:#0c0e0c; border:none;"  > 
+								<input type="password" class="form-control" id="sel2"  name="new_password1" style="background:white; color:#0c0e0c; border:none;"  > 
+								
+								<label >Підтвердіть новий пароль</label>
+								<input type="password" class="form-control" id="sel3"  name="new_password2" style="background:white; color:#0c0e0c; border:none;"  > 
 								
 								<label >Виберіть рівень доступу</label>
 									<select class="form-control"  name="status" id="sel5" size="2" style="background:white; color:#0c0e0c;">
 									<option value="user">Користувач</option>
+									<option value="editor">Редактор</option>
 									<option value="admin">Адміністратор</option>
 									</select>  
 								<p>

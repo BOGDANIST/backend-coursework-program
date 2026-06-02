@@ -5,7 +5,7 @@ const API_BASE = 'admin/api/';
 const AsyncRouter = {
     // === FILTER OPERATIONS ===
 
-    async filterStudents(formElement = null, page = 1, limit = 50) {
+async filterStudents(formElement = null, page = 1, limit = 50) {
         try {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
@@ -14,26 +14,31 @@ const AsyncRouter = {
             const response = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
             if (response.success) {
-                // localStorage.setItem('studentData', JSON.stringify(response.data));
                 try {
-                    //localStorage.setItem('studentData',  JSON.stringify(response.data));
-                    console.success('Good');
+                    // Виправлення 1: console.success не існує, використовуємо console.log
+                    console.log('Дані успішно завантажено'); 
                 } catch (e) {
                     console.warn('Could not save filters to localStorage:', e);
                 }
+                
                 this.renderStudentTable(response.data, false);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
-                ToastNotification.info(response.message);
+                
+                // Виправлення 2: Гарантуємо, що у Toast передається текст (String), 
+                // навіть якщо PHP повернув null або undefined
+                const messageText = response.message ? String(response.message) : 'Дані успішно оновлено';
+                ToastNotification.info(messageText);
+                
             } else {
-                ToastNotification.error(response.message || 'Помилка при пошуку студентів');
+                const errorText = response.message ? String(response.message) : 'Помилка при пошуку студентів';
+                ToastNotification.error(errorText);
             }
         } catch (error) {
             console.error('Filter error:', error);
-            ToastNotification.error('Помилка при пошуку студентів');
+            ToastNotification.error('Помилка при фільтрації');
         }
     },
-
     async filterGroups(formElement = null, page = 1, limit = 50) {
         try {
             const form = formElement || document.getElementById('filter-form');
@@ -454,8 +459,8 @@ const AsyncRouter = {
             ToastNotification.error('Помилка при додаванні користувача');
         }
     },
-
-    async editUser(userId, formElement) {
+    
+async editUser(userId, formElement) {
         try {
             const formData = new FormData(formElement);
             formData.append('user_id', userId);
@@ -464,6 +469,10 @@ const AsyncRouter = {
 
             if (response.success) {
                 ToastNotification.success('Користувача успішно оновлено');
+                
+                // ОЧИЩАЄМО ФОРМУ: всі поля, включаючи паролі, стануть порожніми
+                formElement.reset(); 
+                
                 if (window.loadUsersList) window.loadUsersList();
             } else {
                 if (response.errors) {
@@ -702,7 +711,7 @@ const AsyncRouter = {
         students.forEach((student, index) => {
             html += `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td  class="text-center">${index + 1}</td>
                     <td>${this.escapeHtml(student.s_pr)}</td>
                     <td>${this.escapeHtml(student.s_im)}</td>
                     <td>${this.escapeHtml(student.s_bat)}</td>
@@ -717,10 +726,10 @@ const AsyncRouter = {
                         `;
             } else {
                 html += `
-                    <td class="d-flex justify-content-center border-0 gap-2">
-                        <a href="view_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a>
-                        <a href="edit_student.php?id_st=${student.s_id}" class="btn btn-sm btn-warning">Змінити</a>
-                        <a href="#" onclick="AsyncRouter.deleteOldStudent(${student.s_id}); return false;" class="btn btn-sm btn-danger">Видалити</a>
+                    <td class="d-flex justify-content-center border-0 gap-2 ">
+                        <a href="view_student.php?id_st=${student.s_id}" class="fs-4  btn btn-sm btn-info">Перегляд</a>
+                        <a href="edit_student.php?id_st=${student.s_id}" class=" fs-4 btn btn-sm btn-warning">Змінити</a>
+                        <a href="#" onclick="AsyncRouter.deleteOldStudent(${student.s_id}); return false;" class="fs-4 btn btn-sm btn-danger">Видалити</a>
                     </td>
                     </tr>
                          `;
@@ -887,16 +896,21 @@ const AsyncRouter = {
         return String(text).replace(/[&<>"']/g, m => map[m]);
     },
 
-    async exportStudentsToExcel(formElement = null, page = 1, limit = 50) { // Додано async
+    async exportStudentsToExcel(formElement = null, page = 1, limit = 50, isOld=false) { // Додано async
     try {
         const form = formElement || document.getElementById('filter-form');
         const filters = this.collectFilterData(form);
 
-        console.log('Applying filters:', filters);
+        console.log('Applying filters:', isOld);
         
         // 1. Отримуємо відфільтровані дані студентів
-        const responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
-            console.log('Data to export:', responseData.data);
+        let responseData;
+        if (isOld) {
+            responseData = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=all', 'POST', filters);
+        } else {
+            responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
+        }
+       // console.log('Data to export:', responseData.data);
         if (responseData.success && responseData.data && responseData.data.length > 0) {
             
             // 2. Готуємо дані для PHP
