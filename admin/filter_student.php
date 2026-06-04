@@ -123,13 +123,11 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                             <!-- РІК ЗАВЕРШЕННЯ ШКОЛИ -->
                             <div id="block-search-left mb-5" style="margin-bottom:15px;">
                                 <p class="header-title"
-                                    style="border-top:2px solid #cccccc; margin-bottom:0px; font-size: 15px;"><strong>Пошук
+                                    style="border-top:2px solid #cccccc; margin-bottom:0px; font-size: 15px; "><strong>Пошук
                                         студентів за ПІБ</strong></p>
                                 <div class="" id="block-category">
                                     <label class="col-2" style="font-size: 15px;">ПІБ:</label>
-                                    <input class="col-9" type="text" name="s_pib" value="" style=width:80%; height: 25px;
-                                        background:white; font-size: 15px;margin-top:5px; border:1px solid #cccccc;
-                                        color:#030303; padding-left:10px; border-radius:10px; ">
+                                    <input class="col-9" type="text" name="s_pib" value="" style=width:80%; height: 25px;  color: blue; background:white; font-size: 15px;margin-top:5px; border:1px solid #cccccc;padding-left:10px; border-radius:10px; ">
                                             </div>
                                         </div>
 

@@ -9,10 +9,10 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     error_reporting(0);
     
     // Отримуємо правильний параметр, який передає async.js (id_sp)
-    $id_sp = $_GET["id_sp"] ?? '';
+    $id_sp = $_GET["id_sp_edit"] ?? '';
     
     // Отримуємо дані для редагування
-    $result = mysqli_query($linc, "SELECT * FROM spec WHERE id_sp='$id_sp'");
+    $result = mysqli_query($linc, "SELECT * FROM spec WHERE id_spec='$id_sp'");
     $row = mysqli_fetch_assoc($result);
 }
 ?>

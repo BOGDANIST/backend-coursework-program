@@ -137,8 +137,11 @@ const AsyncRouter = {
             if (response.success) {
                 ToastNotification.success('Студента успішно додано');
                 formElement.reset();
-                // Reload students list
-                this.filterStudents();
+
+                // Оновлюємо список ТІЛЬКИ якщо на сторінці є форма фільтрації
+                if (document.getElementById('filter-form')) {
+                    this.filterStudents();
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -150,7 +153,6 @@ const AsyncRouter = {
             ToastNotification.error('Помилка при додаванні студента');
         }
     },
-
     async editStudent(studentId, formElement) {
         try {
             const formData = new FormData(formElement);
@@ -240,7 +242,15 @@ const AsyncRouter = {
 
             if (response.success) {
                 ToastNotification.success('Студента успішно видалено');
-                this.filterStudents();
+                
+                
+                // Якщо ми на сторінці списку - оновлюємо таблицю
+                if (document.getElementById('filter-form')) {
+                    this.filterStudents();
+                } else if (window.location.pathname.includes('view_student.php')) {
+                    // Якщо видалили з картки перегляду - повертаємось назад
+                    window.history.back();
+                }
             } else {
                 ToastNotification.error(response.message || 'Помилка при видаленні студента');
             }
@@ -258,7 +268,11 @@ const AsyncRouter = {
             if (response.success) {
                 ToastNotification.success('Групу успішно додано');
                 formElement.reset();
-                this.filterGroups();
+                
+                // Оновлюємо список ТІЛЬКИ якщо на сторінці є форма фільтрації
+                if (document.getElementById('filter-form')) {
+                    this.filterGroups();
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -341,7 +355,14 @@ const AsyncRouter = {
 
             if (response.success) {
                 ToastNotification.success('Групу успішно видалено');
-                this.filterGroups();
+                
+                // Якщо ми на сторінці списку - оновлюємо таблицю
+                if (document.getElementById('filter-form')) {
+                    this.filterGroups();
+                } else if (window.location.pathname.includes('view_group.php')) {
+                    // Якщо видалили з картки перегляду - повертаємось назад
+                    window.history.back();
+                }
             } else {
                 ToastNotification.error(response.message || 'Помилка при видаленні групи');
             }
@@ -803,7 +824,7 @@ const AsyncRouter = {
         container.innerHTML = html;
     },
 
-renderSpecTable(specs) {
+    renderSpecTable(specs) {
         const container = document.getElementById('results-table');
         if (!container) return;
 
