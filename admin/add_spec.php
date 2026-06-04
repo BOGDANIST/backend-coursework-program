@@ -49,13 +49,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 
         <form id="add-spec-form" class="needs-validation signup-page" novalidate>
 
-            <div class="mb-3">
-                <label for="id_sp" class="form-label"><strong>ID Спеціальності</strong></label>
-                <input type="text" name="id_sp" id="id_sp" class="form-control" required>
-                <div class="invalid-feedback">
-                    Будь ласка, введіть ID.
-                </div>
-            </div>
+
             <div class="mb-3">
                 <label for="id_galuz" class="form-label"><strong>ID Галузі</strong></label>
                 <input type="text" name="id_galuz" id="id_galuz" class="form-control" required>

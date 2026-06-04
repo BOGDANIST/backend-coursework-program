@@ -58,6 +58,9 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
         <link rel="stylesheet" href="../assets/css/bootstrap.css" rel="stylesheet">
         <!-- Template CSS -->
 		<link rel="stylesheet" href="../css/my_style.css" rel="stylesheet">
+        <!-- Toast Notifications CSS -->
+        <link rel="stylesheet" href="assets/css/toast-notifications.css">
+       
         <!-- Google Fonts-->
         <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
 

@@ -34,21 +34,28 @@ try {
     }
 
     $stmt = $linc->prepare("UPDATE spec SET
-        id_sp = ?, id_galuz = ?, im_galuz = ?, id_spec = ?, im_spec = ?, im_specializ = ?
+         id_galuz = ?, im_galuz = ?, id_spec = ?, im_spec = ?, im_specializ = ?
         WHERE id_sp = ?");
 
     if (!$stmt) {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
     }
 
+// Оголошуємо змінні
+    $id_galuz = $_POST['id_galuz'] ?? '';
+    $im_galuz = $_POST['im_galuz'] ?? '';
+    $id_spec = $_POST['id_spec'] ?? '';
+    $im_spec = $_POST['im_spec'];
+    $im_specializ = $_POST['im_specializ'] ?? '';
+
+    // Передаємо рівно 6 параметрів (5 рядків 's' та 1 число 'i')
     $stmt->bind_param(
-        'ssssssi',
-        $_POST['id_sp'] ?? '',
-        $_POST['id_galuz'] ?? '',
-        $_POST['im_galuz'] ?? '',
-        $_POST['id_spec'] ?? '',
-        $_POST['im_spec'],
-        $_POST['im_specializ'] ?? '',
+        'sssssi',
+        $id_galuz,
+        $im_galuz,
+        $id_spec,
+        $im_spec,
+        $im_specializ,
         $spec_id
     );
 

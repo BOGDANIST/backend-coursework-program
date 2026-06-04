@@ -138,7 +138,7 @@ else
 								
 								<label >Виберіть рівень доступу</label>
 									<select class="form-control"  name="status" id="sel5" size="2" style="background:white; color:#0c0e0c;">
-									<option value="user">Користувач</option>
+									<option value="user">Спостерігач</option>
 									<option value="editor">Редактор</option>
 									<option value="admin">Адміністратор</option>
 									</select>  

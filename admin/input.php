@@ -14,9 +14,9 @@
 	     {
 			$row=mysqli_fetch_array($result);
 			if ($row["status"]==1) 
-			{$_SESSION['auth_user']	= 'user';
+			{$_SESSION['auth_user']	= 'viewer';
 			$_SESSION['login'] = $row['login'];
-	         header("Location: ../users/user_panel.php");
+	         header("Location: admin_panel.php");
 			}
 			if ($row["status"]==10) 
 			{$_SESSION['auth_user']	= 'admin';

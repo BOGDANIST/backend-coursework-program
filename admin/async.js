@@ -359,7 +359,11 @@ async filterStudents(formElement = null, page = 1, limit = 50) {
             if (response.success) {
                 ToastNotification.success('Спеціальність успішно додано');
                 formElement.reset();
-                this.filterSpecialties();
+                
+                // Оновлюємо список ТІЛЬКИ якщо на сторінці є форма фільтрації
+                if (document.getElementById('filter-form')) {
+                    this.filterSpecialties();
+                }
             } else {
                 if (response.errors) {
                     this.highlightFormErrors(formElement, response.errors);
@@ -398,9 +402,10 @@ async filterStudents(formElement = null, page = 1, limit = 50) {
 
     updateSpecFormFields(formElement, specData) {
         const fieldMapping = {
+            'id_sp': 'id_sp',             // Додано нове ключове поле
             'id_galuz': 'id_galuz',
             'im_galuz': 'im_galuz',
-            'id_spec': 'id_spec',
+            'id_spec': 'id_spec',         // Старе поле (залишаємо, якщо воно ще використовується як звичайний номер)
             'im_spec': 'im_spec',
             'im_specializ': 'im_specializ'
         };
@@ -815,8 +820,9 @@ async editUser(userId, formElement) {
                     <td>${this.escapeHtml(spec.im_galuz || '')}</td>
                     <td>${this.escapeHtml(spec.im_spec)}</td>
                     <td>${this.escapeHtml(spec.im_specializ || '')}</td>
-                    <td>
-                        <a href="#" onclick="AsyncRouter.deleteSpec(${spec.id_sp}); return false;">Видалити</a>
+                    <td class="d-flex gap-2">
+                        <a href="edit_spec.php?id_sp=${spec.id_sp}" class="btn btn-sm btn-warning">Змінити</a>
+                        <a href="#" onclick="AsyncRouter.deleteSpec(${spec.id_sp}); return false;" class="btn btn-sm btn-danger">Видалити</a>
                     </td>
                 </tr>
             `;

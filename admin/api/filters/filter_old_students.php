@@ -50,13 +50,13 @@ try {
 
     // Specialties
     $check_sp = $_POST['check_sp'] ?? [];
-    if (empty($check_sp)) {
-        $spec_query = "SELECT DISTINCT im_spec FROM spec ORDER BY id_spec ASC";
-        $result = mysqli_query($linc, $spec_query);
-        while ($row = mysqli_fetch_assoc($result)) {
-            $check_sp[] = $row['im_spec'];
-        }
-    }
+    // if (empty($check_sp)) {
+    //     $spec_query = "SELECT DISTINCT im_spec FROM spec ORDER BY id_spec ASC";
+    //     $result = mysqli_query($linc, $spec_query);
+    //     while ($row = mysqli_fetch_assoc($result)) {
+    //         $check_sp[] = $row['im_spec'];
+    //     }
+    // }
 
     if (!empty($check_sp)) {
         $escaped_sp = array_map(function($v) use ($linc) {

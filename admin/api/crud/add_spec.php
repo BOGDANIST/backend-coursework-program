@@ -35,14 +35,21 @@ try {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
     }
 
+    $id_sp = $_POST['id_sp'] ?? '';
+    $id_galuz = $_POST['id_galuz'] ?? '';
+    $im_galuz = $_POST['im_galuz'] ?? '';
+    $id_spec = $_POST['id_spec'] ?? '';
+    $im_spec = $_POST['im_spec'];
+    $im_specializ = $_POST['im_specializ'] ?? '';
+
     $stmt->bind_param(
         'ssssss',
-        $_POST['id_sp'] ?? '',
-        $_POST['id_galuz'] ?? '',
-        $_POST['im_galuz'] ?? '',
-        $_POST['id_spec'] ?? '',
-        $_POST['im_spec'],
-        $_POST['im_specializ'] ?? ''
+        $id_sp,
+        $id_galuz,
+        $im_galuz,
+        $id_spec,
+        $im_spec,
+        $im_specializ
     );
 
     if (!$stmt->execute()) {
