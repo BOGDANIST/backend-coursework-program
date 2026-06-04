@@ -3,14 +3,21 @@ session_start();
 
 if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
     header("Location: admin_panel.php");
+    exit;
 } else {
-    include ("../include/db_connect.php");
+    require_once dirname(__DIR__) . '/bootstrap.php';
     error_reporting(0);
 
     $id_st = $_GET["id_st"] ?? null;
 
     if (!$id_st) {
         die("ID студента не вказано!");
+    }
+
+    $studentModel = new \App\Modules\Students\Models\StudentModel();
+    $student = $studentModel->findById((string)$id_st);
+    if (!$student) {
+        die("Студента не знайдено!");
     }
 }
 ?>
@@ -118,12 +125,8 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
                                     <h2 style="font-size:25px; color:#eaf0f8; text-align: center;"><strong>Перегляд даних про студента</strong></h2>
 								</div>
 				  <?php
-                  $result = mysqli_query($linc, "SELECT * FROM student WHERE s_id='$id_st'");
-                  if (mysqli_num_rows($result)>0)
-                    {
-                        $row = mysqli_fetch_array($result);
-                         do
-                        {
+                  if ($student) {
+                        $row = $student;
 
 					          echo '        
 							<label><strong>Прізвище</strong></label>
@@ -192,9 +195,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {
 
 
 								  ';
-						}
-					
-                      while ($row = mysqli_fetch_array($result));	
 					}
 	      
 				?>

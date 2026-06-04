@@ -13,21 +13,21 @@ const AsyncRouter = {
             console.log('Applying filters:', filters);
             const response = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=' + limit, 'POST', filters);
 
-            if (response.success) {
+            if (response.success && response.data) {
                 try {
                     // Виправлення 1: console.success не існує, використовуємо console.log
                     console.log('Дані успішно завантажено');
                 } catch (e) {
                     console.warn('Could not save filters to localStorage:', e);
                 }
-
-                this.renderStudentTable(response.data, false);
-                this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
+                // The data is now nested under `data.items` and `data.pagination`
+                this.renderStudentTable(response.data.items, false);
+                this.renderPagination(response.data.pagination.page, response.data.pagination.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
 
                 // Виправлення 2: Гарантуємо, що у Toast передається текст (String), 
                 // навіть якщо PHP повернув null або undefined
-                const messageText = response.message ? String(response.message) : 'Дані успішно оновлено';
+                const messageText = response.message ? String(response.message) : 'Дані успішно завантажено';
                 ToastNotification.info(messageText);
 
             } else {
@@ -132,7 +132,7 @@ const AsyncRouter = {
     async addStudent(formElement) {
         try {
             const formData = new FormData(formElement);
-            const response = await this.sendRequest('crud/add_student.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/students_create.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Студента успішно додано');
@@ -158,7 +158,7 @@ const AsyncRouter = {
             const formData = new FormData(formElement);
             formData.append('id', studentId);
             //console.log('Editing student with data:', Object.fromEntries(formData));
-            const response = await this.sendRequest('crud/edit_student.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/students_edit.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Студента успішно оновлено');
@@ -238,7 +238,7 @@ const AsyncRouter = {
         }
 
         try {
-            const response = await this.sendRequest('crud/delete_student.php', 'POST', { id: studentId });
+            const response = await this.sendRequest('crud/students_delete.php', 'POST', { id: studentId });
 
             if (response.success) {
                 ToastNotification.success('Студента успішно видалено');
@@ -263,7 +263,7 @@ const AsyncRouter = {
     async addGroup(formElement) {
         try {
             const formData = new FormData(formElement);
-            const response = await this.sendRequest('crud/add_group.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/groups_create.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Групу успішно додано');
@@ -292,7 +292,7 @@ const AsyncRouter = {
             const formData = new FormData(formElement);
             formData.append('id', groupId);
             //console.log('Editing group with data:');
-            const response = await this.sendRequest('crud/edit_group.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/groups_edit.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Групу успішно оновлено');
@@ -351,7 +351,7 @@ const AsyncRouter = {
         }
 
         try {
-            const response = await this.sendRequest('crud/delete_group.php', 'POST', { id: groupId });
+            const response = await this.sendRequest('crud/groups_delete.php', 'POST', { id: groupId });
 
             if (response.success) {
                 ToastNotification.success('Групу успішно видалено');
@@ -467,7 +467,7 @@ const AsyncRouter = {
     async addUser(formElement) {
         try {
             const formData = new FormData(formElement);
-            const response = await this.sendRequest('crud/add_user.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/users_create.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Користувача успішно додано');
@@ -491,7 +491,7 @@ const AsyncRouter = {
             const formData = new FormData(formElement);
             formData.append('user_id', userId);
 
-            const response = await this.sendRequest('crud/edit_user.php', 'POST', Object.fromEntries(formData));
+            const response = await this.sendRequest('crud/users_edit.php', 'POST', Object.fromEntries(formData));
 
             if (response.success) {
                 ToastNotification.success('Користувача успішно оновлено');
@@ -609,6 +609,8 @@ const AsyncRouter = {
             });
         }
 
+        console.log(`Sending ${method} request to ${url} with data:`, data);
+        console.log('Fetch options:', url , options);
         const response = await fetch(url, options);
 
         if (!response.ok) {
@@ -962,12 +964,13 @@ const AsyncRouter = {
                 responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
             }
             // console.log('Data to export:', responseData.data);
-            if (responseData.success && responseData.data && responseData.data.length > 0) {
+            const itemsToExport = isOld ? responseData.data : (responseData.data ? responseData.data.items : []);
+            if (responseData.success && itemsToExport && itemsToExport.length > 0) {
 
                 // 2. Готуємо дані для PHP
                 const formData = new FormData();
                 formData.append('download_excel', 'yes');
-                formData.append('export_data', JSON.stringify(responseData.data)); // Передаємо самі дані
+                formData.append('export_data', JSON.stringify(itemsToExport)); // Передаємо масив студентів
 
                 // Використовуємо нативний fetch, бо нам потрібен Blob (файл), а не JSON
                 const response = await fetch('api/export/export_excel.php', {

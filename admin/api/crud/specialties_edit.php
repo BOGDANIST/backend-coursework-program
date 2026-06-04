@@ -10,6 +10,13 @@ ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 ini_set('error_log', dirname(__DIR__, 3) . '/error.log');
 
+$logMessage = sprintf(
+    "[%s] POST to specialties_edit.php. POST keys: %s",
+    date('Y-m-d H:i:s'),
+    implode(', ', array_keys($_POST))
+);
+error_log($logMessage);
+
 ob_start();
 
 try {
@@ -23,12 +30,22 @@ try {
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
 
-    error_log("[" . date('Y-m-d H:i:s') . "] SpecialtyEdit Error: " . $e->getMessage());
+    $errorLog = sprintf(
+        "[%s] SpecialtyEdit Error: %s\nFile: %s:%d\nStack: %s",
+        date('Y-m-d H:i:s'),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine(),
+        $e->getTraceAsString()
+    );
+    error_log($errorLog);
 
     echo json_encode([
         'success' => false,
         'message' => 'Внутрішня помилка сервера',
         'status_code' => 500,
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'debug_file' => $e->getFile(),
+        'debug_line' => $e->getLine()
     ], JSON_UNESCAPED_UNICODE);
 }

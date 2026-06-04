@@ -1,42 +1,49 @@
 <?php
-
 session_start();
 
-	if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer']))
-	{   
-		header("Location: admin_panel.php");
-	}    
-else
-	{
-	include ("../include/db_connect.php");
-	
-	error_reporting(0);
-	
-	echo '
+if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {   
+    header("Location: admin_panel.php");
+    exit;
+} else {
+    require_once dirname(__DIR__) . '/bootstrap.php';
+    error_reporting(0);
+
+    echo '
     <script>
-	function confirmSpelll() 
-		{
-		if (confirm("Разом з групою будуть видалені студенти. Ви підтверджуєте видалення?")) 
-			{
-				return true;
-			} 
-		else 
-			{
-				return false;
-			}
-		}
-	 </script>
-	';
-		
-		if ($_GET["g_im_delete"]!="")
-		{$error =  $id =$_GET["g_im_delete"];
-			
-			$delete_st = mysqli_query($linc,"DELETE FROM student WHERE s_group='$id'");
-			
-			$delete_gr = mysqli_query($linc, "DELETE FROM st_group WHERE g_im='$id'");
-			$error =  'Видалено групу - '.$_GET["g_im_delete"];  
-		}		 
-	} 
+    function confirmSpelll() 
+        {
+        if (confirm("Разом з групою будуть видалені студенти. Ви підтверджуєте видалення?")) 
+            {
+                return true;
+            } 
+        else 
+            {
+                return false;
+            }
+        }
+     </script>
+    ';
+
+    $db = \App\Core\Database::getInstance()->getConnection();
+    
+    if (!empty($_GET["g_im_delete"]) && in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+        $id = $_GET["g_im_delete"];
+        
+        $stmt1 = $db->prepare("DELETE FROM student WHERE s_group=?");
+        $stmt1->bind_param('s', $id);
+        $stmt1->execute();
+        
+        $stmt2 = $db->prepare("DELETE FROM st_group WHERE g_im=?");
+        $stmt2->bind_param('s', $id);
+        $stmt2->execute();
+        
+        $error = 'Видалено групу - ' . htmlspecialchars($id);  
+    }
+
+    $groupModel = new \App\Modules\Groups\Models\GroupModel();
+    $allGroups = $groupModel->getAll();
+    $totalGroups = count($allGroups);
+} 
 ?>
 
 
@@ -116,56 +123,75 @@ else
 									<div class="tab-panel active in fade" id="faq">
                                         <div class="panel-group" id="accordion">
                                                 <h2 class="margin-bottom" style="text-align:center; color:#56693c;"><strong>Список груп</strong></h2> 
-												<p style="text-align:center; color:#56693c;">
-											<?php 
-												 $result_group =  mysqli_query($linc, "SELECT * FROM st_group");
-												 if (mysqli_num_rows( $result_group)>0) echo "<h3 class='fs-2 text-center'><strong>Всього у коледжі навчаеться ".mysqli_num_rows( $result_group)." груп, з яких:</strong></h3>";
-											?> </p>
-												<div class="col-md-12" style="margin-top:0px;border:none;" >
-												<?php
-												// Масив конфігурацій для всіх курсів та відділень
-												$configs = [
-													['course' => '1', 'form' => 'Денна', 'title' => 'І курс, денне відділення'],
-													['course' => '1', 'form' => 'Заочна', 'title' => 'І курс, заочне відділення'],
-													['course' => '2', 'form' => 'Денна', 'title' => 'ІІ курс, денне відділення'],
-													['course' => '2', 'form' => 'Заочна', 'title' => 'ІІ курс, заочне відділення'],
-													['course' => '3', 'form' => 'Денна', 'title' => 'ІІІ курс, денне відділення'],
-													['course' => '3', 'form' => 'Заочна', 'title' => 'ІІІ курс, заочне відділення'],
-													['course' => '4', 'form' => 'Денна', 'title' => 'ІV курс, денне відділення'],
-													['course' => '4', 'form' => 'Заочна', 'title' => 'ІV курс, заочне відділення'],
-												];
+                                                <p style="text-align:center; color:#56693c;">
+                                            <?php 
+                                                 if ($totalGroups > 0) {
+                                                    echo "<h3 class='fs-2 text-center'><strong>Всього у коледжі навчаеться {$totalGroups} груп, з яких:</strong></h3>";
+                                                 }
+                                            ?> </p>
+                                                <div class="col-md-12" style="margin-top:0px;border:none;" >
+                                                <?php
+                                                // Масив конфігурацій для всіх курсів та відділень
+                                                $configs = [
+                                                    ['course' => '1', 'form' => 'Денна', 'title' => 'І курс, денне відділення'],
+                                                    ['course' => '1', 'form' => 'Заочна', 'title' => 'І курс, заочне відділення'],
+                                                    ['course' => '2', 'form' => 'Денна', 'title' => 'ІІ курс, денне відділення'],
+                                                    ['course' => '2', 'form' => 'Заочна', 'title' => 'ІІ курс, заочне відділення'],
+                                                    ['course' => '3', 'form' => 'Денна', 'title' => 'ІІІ курс, денне відділення'],
+                                                    ['course' => '3', 'form' => 'Заочна', 'title' => 'ІІІ курс, заочне відділення'],
+                                                    ['course' => '4', 'form' => 'Денна', 'title' => 'ІV курс, денне відділення'],
+                                                    ['course' => '4', 'form' => 'Заочна', 'title' => 'ІV курс, заочне відділення'],
+                                                ];
 
-												foreach ($configs as $config) {
-													$result_group1 = mysqli_query($linc, "SELECT * FROM `st_group` WHERE `g_formnavch`='" . mysqli_real_escape_string($linc, $config['form']) . "' AND `g_course`='" . mysqli_real_escape_string($linc, $config['course']) . "'");
-													//echo $result_group1 ;
-													if (mysqli_num_rows($result_group1) > 0) {
-														echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;">
-															<strong>' . htmlspecialchars($config['title']) . ':</strong>
-														</h3>
-														<div class="col-md-12">
-															<table class="table table-primary rounded-1 table-striped d-flex table-layout: auto; table-responsive-md justify-content-md-center fs-3 fs-sm-1 d-flex ">';
-														
-														$i = 1;
-														while ($row = mysqli_fetch_array($result_group1)) {
-															echo '<tr>
-																<td class="col-md-1" style="white-space: nowrap;"><strong>' . $i . '</strong></td>
-																<td class="col-md-2"><strong>' . htmlspecialchars($row['g_im']) . '</strong></td>
-																<td style="white-space: nowrap;" class="col-md-3"><strong>Кількість студентів: ' . htmlspecialchars($row['g_count_stud']) . '</strong></td>
-																<td class="col-md-2 fw-bold text-center" style="text-decoration-line: underline; font-size: 16 px;"><strong><a href="view_group.php?g_im=' . urlencode($row["g_im"]) . '">Переглянути</a></strong></td>';
-															
-															if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-																echo '<td class="col-md-2" style="text-decoration-line: underline;"><strong><a href="edit_group.php?g_im_edit=' . urlencode($row["g_im"]) . '">Змінити</a></strong></td>';
-															}
-															
-															echo '</tr>';
-															$i++;
-														}
-														
-														echo '</table></div>';
-													}
-												}
-												?>
-												</div>
+                                                foreach ($configs as $config) {
+                                                    $filteredGroups = array_filter($allGroups, function($group) use ($config) {
+                                                        return $group['g_formnavch'] === $config['form'] && $group['g_course'] === $config['course'];
+                                                    });
+
+                                                    if (count($filteredGroups) > 0) {
+                                                        echo '<h3 class="fs-2" style="margin-left:10px; margin-bottom:0px; margin-top:20px;">
+                                                            <strong>' . htmlspecialchars($config['title']) . ':</strong>
+                                                        </h3>
+                                                        <div class="">
+                                                            <div class="table-responsive">
+                                                            <table class="table table-primary table-striped table-hover align-middle text-center fs-3">';
+                                                        echo '<thead>
+                                                                <tr>
+                                                                    <th scope="col" class="text-center">№</th>
+                                                                    <th scope="col" class="text-center">Назва групи</th>
+                                                                    <th scope="col" class="text-center">Кількість студентів</th>
+                                                                    <th scope="col" class="text-center">Переглянути</th>';
+                                                        if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                                                            echo '<th scope="col" class="text-center">Дії</th>';
+                                                        }
+                                                        echo '</tr>
+                                                            </thead>
+                                                            <tbody>';
+                                                        
+                                                        $i = 1;
+                                                        foreach ($filteredGroups as $row) {
+                                                            echo '<tr>
+                                                                <td>' . $i . '</td>
+                                                                <td>' . htmlspecialchars($row['g_im']) . '</td>
+                                                                <td>' . htmlspecialchars($row['g_count_stud']) . '</td>
+                                                                <td><a href="view_group.php?g_im=' . urlencode($row["g_im"]) . '" class="btn btn-info btn-sm">Переглянути</a></td>';
+                                                            
+                                                            if (in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                                                                echo '<td>
+                                                                    <a href="edit_group.php?g_im_edit=' . urlencode($row["g_im"]) . '" class="btn btn-warning btn-sm me-2">Змінити</a>
+                                                                    <a href="filter_group.php?g_im_delete=' . urlencode($row["g_im"]) . '" onclick="return confirmSpelll();" class="btn btn-danger btn-sm">Видалити</a>
+                                                                </td>';
+                                                            }
+                                                            
+                                                            echo '</tr>';
+                                                            $i++;
+                                                        }
+                                                        
+                                                        echo '</tbody></table></div></div>';
+                                                    }
+                                                }
+                                                ?>
+                                                </div>
 										
 										
 										

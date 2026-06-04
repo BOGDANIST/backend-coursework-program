@@ -144,7 +144,7 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
                                         <td><?= htmlspecialchars($row['im_specializ']) ?></td>
 										<td class="text-center" style="vertical-align: middle;">
                                         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; height: 100%;">
-                                            <a href="edit_spec.php?id_sp_edit=<?= $row['id_spec'] ?>" 
+                                            <a href="edit_spec.php?id_sp=<?= $row['id_sp'] ?>" 
                                             class="btn btn-sm" 
                                             style="color: aliceblue; background-color: #63949E; font-size: 18px; padding: 10px;">
                                                 Редагувати

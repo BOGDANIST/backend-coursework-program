@@ -1,5 +1,7 @@
 <?php
-	session_start();
+	if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 	if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer']))
 	{   unset($_SESSION['auth_user']);
 		header("Location:../admin/input.php");

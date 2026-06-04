@@ -4,8 +4,15 @@ session_start();
 if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
     header("Location: admin_panel.php");
 } else {
-    include("../include/db_connect.php");
+    require_once dirname(__DIR__) . '/bootstrap.php';
+    
+    $groupModel = new \App\Modules\Groups\Models\GroupModel();
+    $allGroups = $groupModel->getAll();
+
+    $specialtyModel = new \App\Modules\Specialties\Models\SpecialtyModel();
+    $allSpecialties = $specialtyModel->getAll();
     error_reporting(0);
+
     ?>
 
     <!-- === BEGIN HEADER === -->
@@ -158,22 +165,20 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                                         aria-expanded="false">
                                         Галузь знань
                                     </button>
-                                    <div id="dropdownGzMenu" class="collapse dropdown-filter-menu border rounded p-3 mt-2"
-                                        style="font-size: 15px;">
+                                    <div id="dropdownGzMenu" class="collapse dropdown-filter-menu border rounded p-3 mt-2" style="font-size: 15px;">
                                         <ul class="list-unstyled m-0">
                                             <?php
-                                            $gz_query = "SELECT DISTINCT im_galuz AS gz FROM spec ORDER BY im_galuz ASC";
-                                            $gz_result = mysqli_query($linc, $gz_query);
-                                            if ($gz_result) {
-                                                while ($row_gz = mysqli_fetch_assoc($gz_result)) {
+                                            $uniqueGaluz = array_unique(array_column($allSpecialties, 'im_galuz'));
+                                            sort($uniqueGaluz);
+                                            foreach ($uniqueGaluz as $galuz) {
+                                                if (!empty($galuz)) {
                                                     $value = htmlspecialchars($row_gz['gz']);
                                                     echo '<li class="dropdown-gz-item">
                                                         <label>
                                                             <input type="checkbox" name="check_gz[]" value="' . $value . '"> ' . $value . '
                                                         </label>
                                                     </li>';
-                                                }
-                                            }
+                                                }}
                                             ?>
                                         </ul>
                                     </div>
@@ -192,18 +197,16 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                                         style="font-size: 15px;">
                                         <ul class="list-unstyled m-0">
                                             <?php
-                                            $spec_query = "SELECT DISTINCT im_spec AS spec FROM spec ORDER BY id_spec ASC";
-                                            $spec_result = mysqli_query($linc, $spec_query);
-                                            if ($spec_result) {
-                                                while ($row_spec = mysqli_fetch_assoc($spec_result)) {
-                                                    $spec = htmlspecialchars($row_spec['spec']);
+                                            $uniqueSpec = array_unique(array_column($allSpecialties, 'im_spec')); // Отримуємо унікальні назви спеціальностей
+                                            sort($uniqueSpec); // Сортуємо їх
+                                            foreach ($uniqueSpec as $spec) { // Перебираємо кожну унікальну спеціальність
+                                                if (!empty($spec)) {
                                                     echo '<li class="dropdown-specialty-item">
                                                         <label>
                                                             <input type="checkbox" name="check_sp[]" value="' . $spec . '"> ' . $spec . '
                                                         </label>
                                                     </li>';
-                                                }
-                                            }
+                                                }}
                                             ?>
                                         </ul>
                                     </div>
@@ -272,8 +275,8 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
                                             <select class="form-select fs-4" name="form_group" id="form_group">
                                                 <option value="">-- Виберіть групу --</option>
                                                 <?php
-                                                $query_group = mysqli_query($linc, "SELECT * FROM st_group");
-                                                while ($temp = mysqli_fetch_assoc($query_group)) {
+                                                
+                                                foreach ($allGroups as $temp) {
                                                     echo '<option value="' . htmlspecialchars($temp['g_im']) . '">' . htmlspecialchars($temp['g_im']) . '</option>';
                                                 }
                                                 ?>
@@ -559,6 +562,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
 
     </html>
 
-    <?php
+<?php
 }
 ?>

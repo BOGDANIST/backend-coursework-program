@@ -3,11 +3,21 @@ session_start();
 
 if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 	header("Location: admin_panel.php");
+	exit;
 } else {
-	include("../include/db_connect.php");
+	require_once dirname(__DIR__) . '/bootstrap.php';
 	error_reporting(0);
 
-	$id_st = $_GET["id_st"];
+	$id_st = $_GET["id_st"] ?? '';
+	if (empty($id_st)) {
+		die("ID студента не вказано!");
+	}
+
+	$studentModel = new App\Modules\Students\Models\StudentModel();
+	$student = $studentModel->findById((int)$id_st);
+	if (!$student) {
+		die("Студента не знайдено!");
+	}
 }
 ?>
 
@@ -105,11 +115,8 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 													та редагування даних про студента</strong></p>
 										</div>
 										<?php
-										$result = mysqli_query($linc, "SELECT * FROM student WHERE s_id='$id_st'");
-										if (mysqli_num_rows($result) > 0) {
-											$row = mysqli_fetch_array($result);
-											do {
-												//echo print_r($row, true);
+										if ($student) {
+											$row = $student;
 												echo '
                                <label><strong>Прізвище</strong></label>
 								<strong> <input type="text" class="form-control" name="form_pr_stud" value="' . $row['s_pr'] . '" style="background:white; color:#0c0e0c; border:none;"  ></strong>
@@ -134,11 +141,12 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 								<input type="text" class="form-control" name="form_group" value="' . $row['s_group'] . '" style="background:white; color:#0c0e0c; border:none;"  >
 								';
 
-												$query_group = mysqli_query($linc, "SELECT * FROM st_group");
+												$groupModel = new \App\Modules\Groups\Models\GroupModel();
+												$groups = $groupModel->getAll();
 												echo '<select class="form-control" name="form_group" size="5" style="color:#0c0e0c;">';
 												echo '<option value=""></option>';
-												while ($temp = mysqli_fetch_assoc($query_group)) {
-													echo '<option style="color:#0c0e0c;" value=' . $temp['g_im'] . '>' . $temp['g_im'] . '</option>';
+												foreach ($groups as $temp) {
+													echo '<option style="color:#0c0e0c;" value="' . htmlspecialchars($temp['g_im']) . '">' . htmlspecialchars($temp['g_im']) . '</option>';
 												}
 												echo '</select>
 
@@ -244,9 +252,6 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
 									 <input type="text" class="form-control"  name="form_tel_mut" value="' . $row['s_telm'] . '" style="background:white; color:#0c0e0c; border:none;">
 
 									  ';
-											}
-
-											while ($row = mysqli_fetch_array($result));
 										}
 										?>
 

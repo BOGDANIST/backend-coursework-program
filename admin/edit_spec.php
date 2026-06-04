@@ -5,15 +5,17 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
     header("Location: admin_panel.php");
     exit;
 } else {
-    include ("../include/db_connect.php");
+    // Завантажуємо середовище MVC
+    require_once dirname(__DIR__) . '/bootstrap.php';
+
     error_reporting(0);
     
     // Отримуємо правильний параметр, який передає async.js (id_sp)
-    $id_sp = $_GET["id_sp_edit"] ?? '';
+    $id_sp = $_GET["id_sp"] ?? '';
     
-    // Отримуємо дані для редагування
-    $result = mysqli_query($linc, "SELECT * FROM spec WHERE id_spec='$id_sp'");
-    $row = mysqli_fetch_assoc($result);
+    // Використовуємо модель замість прямих запитів до бази
+    $specialtyModel = new \App\Modules\Specialties\Models\SpecialtyModel();
+    $row = $specialtyModel->findById($id_sp);
 }
 ?>
 <!DOCTYPE html>

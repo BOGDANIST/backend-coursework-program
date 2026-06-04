@@ -96,16 +96,16 @@ else {
 															</div>
 
 															<label for="sel1">Введіть логін</label>
-															<input type="text" class="form-control" id="sel1" name="input_login" style="background:white; color:#0c0e0c; border:none;" required>
+															<input type="text" class="form-control" id="sel1" name="login" style="background:white; color:#0c0e0c; border:none;" required>
 
 															<label>Введіть пароль</label>
-															<input type="password" class="form-control" id="sel2" name="input_password1" style="background:white; color:#0c0e0c; border:none;" required>
+															<input type="password" class="form-control" id="sel2" name="password1" style="background:white; color:#0c0e0c; border:none;" required>
 
 															<label>Підтвердить пароль</label>
-															<input type="password" class="form-control" id="sel3" name="input_password2" style="background:white; color:#0c0e0c; border:none;" required>
+															<input type="password" class="form-control" id="sel3" name="password2" style="background:white; color:#0c0e0c; border:none;" required>
 
 															<label>Виберіть рівень доступу</label>
-															<select class="form-control" name="input_status" id="sel5" size="3" style="background:white; color:#0c0e0c;" required>
+															<select class="form-control" name="status" id="sel5" size="3" style="background:white; color:#0c0e0c;" required>
 																<option value="admin">Адміністратор</option>
 																<option value="editor">Редактор</option>
 																<option value="viewer">Спостерігач</option>

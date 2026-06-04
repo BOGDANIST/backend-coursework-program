@@ -1,24 +1,34 @@
+
 <?php
+
 session_start();
+
+// ТИМЧАСОВО вмикаємо показ помилок, щоб бачити, що відбувається
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 // Перевірка доступу
 if (!in_array($_SESSION['auth_user'], ['admin', 'editor','viewer'])) {   
     header("Location: admin_panel.php");
+    exit;
 } else {
-    include ("../include/db_connect.php");
-    error_reporting(0);
+    require_once dirname(__DIR__) . '/bootstrap.php';
 }
+
+use App\Modules\Students\Models\StudentModel;
 
 // Перевірка наявності ідентифікатора групи
 if (!isset($_GET['g_im']) || empty($_GET['g_im'])) {
     die("Групу не вказано!");
 }
 
-$group = mysqli_real_escape_string($linc, $_GET['g_im']);
+// ВИПРАВЛЕНО: Прибрали mysqli_real_escape_string та $linc
+$group = (string) $_GET['g_im'];
 
-// Отримання студентів з таблиці student для заданої групи
-$sql = "SELECT * FROM student WHERE s_group='$group' GROUP BY s_id ORDER BY s_pr ASC";
-$result = mysqli_query($linc, $sql);
+// Використовуємо StudentModel для отримання студентів
+$studentModel = new StudentModel();
+$students = $studentModel->findByGroup($group);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,48 +88,50 @@ $result = mysqli_query($linc, $sql);
             <!-- End Top Menu -->
            
             <!-- === BEGIN CONTENT === -->
-            <div class="container bottom-border">
+           <div class="container bottom-border">
                 <div class="row padding-top-40">
                     <div class="col-md-12">
                         <h2 class="text-center" style="color:#56693c;">
                             <strong>Студенти групи <span style="color:#D35400;"><?php echo htmlspecialchars($group); ?></span></strong>
                         </h2>
                         <?php 
-                        if (mysqli_num_rows($result) > 0) {
+                        if (count($students) > 0) {
                             echo '<div class="col-md-12" style="margin-top:10px;">';
-                            echo '<table class="table table-primary rounded-1 table-striped d-flex table-responsive-md fs-3 fs-sm-1 justify-content-md-center">';
-                            echo '
+                            echo '<table class="table table-primary rounded-1 table-striped table-responsive-md fs-3 fs-sm-1 justify-content-md-center">
                                     <tr>
                                         <th class="col-md-1 text-center align-middle" style="white-space: nowrap;">ID</th>
                                         <th class="col-md-2 text-center align-middle">Прізвище</th>
                                         <th class="col-md-2 text-center align-middle">Ім\'я</th>
                                         <th class="col-md-2 text-center align-middle">По батькові</th>
                                         <th class="col-md-2 text-center align-middle">Дата народження</th>
-										<th class="col-md-1 text-center align-middle">Перегляд</th>
+                                        <th class="col-md-1 text-center align-middle">Перегляд</th>
                                         ';
-                                        if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-                                           echo '<th class="col-md-1 text-center align-middle">Редагування</th>';
-                                        }
-                                        echo '
-                                    </tr>
-                                
-								  ';
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo '<tr>
-                                        <td>' . htmlspecialchars($row['s_id']) . '</td>
-                                        <td>' . htmlspecialchars($row['s_pr']) . '</td>
-                                        <td>' . htmlspecialchars($row['s_im']) . '</td>
-                                        <td>' . htmlspecialchars($row['s_bat']) . '</td>
-                                        <td>' . htmlspecialchars($row['s_dnar']) . '</td>
-										<td class="text-decoration-underline"> <a href="view_student.php?id_st=' . $row["s_id"] .  '">Перегляд</a> </td>
-                                        ';
-                                        if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
-                                           echo '<td class="text-decoration-underline"> <a href="edit_student.php?id_st=' . $row["s_id"] .  '">Редагувати</a> </td>';
-                                        }
-                                        echo '
-                                      </tr>';
+                                        
+                            // Виправлено: тепер ми не закриваємо PHP, а просто виводимо HTML через echo
+                            if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                               echo '<th class="col-md-1 text-center align-middle">Редагування</th>';
                             }
-                            echo '	</table></div>';
+                            
+                            echo '</tr>'; 
+
+                            foreach ($students as $row) {
+                                echo '<tr>
+                                        <td>' . htmlspecialchars((string)$row['s_id']) . '</td>
+                                        <td>' . htmlspecialchars((string)$row['s_pr']) . '</td>
+                                        <td>' . htmlspecialchars((string)$row['s_im']) . '</td>
+                                        <td>' . htmlspecialchars((string)$row['s_bat']) . '</td>
+                                        <td>' . htmlspecialchars((string)$row['s_dnar']) . '</td>
+                                        <td class="text-decoration-underline"> <a href="view_student.php?id_st=' . htmlspecialchars((string)$row['s_id']) .  '">Перегляд</a> </td>
+                                        ';
+                                        
+                                if(in_array($_SESSION['auth_user'], ['admin', 'editor'])) {
+                                   echo '<td class="text-decoration-underline"> <a href="edit_student.php?id_st=' . htmlspecialchars((string)$row['s_id']) . '">Редагувати</a> </td>';
+                                }
+                                
+                                echo '</tr>';
+                            }
+                            
+                            echo '  </table></div>';
                         } else {
                             echo '<p class="text-center"><strong>Студентів у цій групі не знайдено.</strong></p>';
                         }
@@ -127,6 +139,7 @@ $result = mysqli_query($linc, $sql);
                     </div>
                 </div>
             </div>
+
             <!-- === END CONTENT === -->
 
         </div>

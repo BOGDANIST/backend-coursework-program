@@ -14,7 +14,8 @@ ob_start();
 
 try {
     $controller = new SpecialtyController();
-    $controller->execute('edit');
+    $action = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'delete' : 'get';
+    $controller->execute($action);
 } catch (Throwable $e) {
     if (ob_get_level() > 0) {
         ob_end_clean();
@@ -23,7 +24,7 @@ try {
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
 
-    error_log("[" . date('Y-m-d H:i:s') . "] SpecialtyEdit Error: " . $e->getMessage());
+    error_log("[" . date('Y-m-d H:i:s') . "] SpecialtyGet/Delete Error: " . $e->getMessage());
 
     echo json_encode([
         'success' => false,
