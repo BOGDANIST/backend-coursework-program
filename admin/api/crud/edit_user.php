@@ -6,6 +6,7 @@ if (!in_array($_SESSION['auth_user'] ?? '', ['admin'])) {
     header('HTTP/1.1 403 Forbidden');
     include __DIR__ . '/../ApiResponse.php';
     (new ApiResponse(false, 'Доступ заборонено'))->send();
+    exit;
 }
 
 include '../../../include/db_connect.php';
@@ -24,15 +25,15 @@ try {
     }
 
     $user_id = (int)$_POST['user_id'];
+    
+    // Перевіряємо, чи ввів адміністратор новий пароль
+    $is_password_change = !empty($_POST['new_password1'] ?? '');
 
-    // Перевірка, чи введено новий пароль
-    if (empty($_POST['new_password1'] ?? '')) {
-        $errors['new_password1'] = 'Новий пароль обов\'язковий';
-    }
-
-    // Перевірка, чи збігаються новий пароль та підтвердження
-    if (($_POST['new_password1'] ?? '') !== ($_POST['new_password2'] ?? '')) {
-        $errors['new_password2'] = 'Паролі не збігаються';
+    // Якщо пароль введено, перевіряємо, чи збігається він з другим полем
+    if ($is_password_change) {
+        if ($_POST['new_password1'] !== ($_POST['new_password2'] ?? '')) {
+            $errors['new_password2'] = 'Паролі не збігаються';
+        }
     }
 
     if (!empty($errors)) {
@@ -40,18 +41,24 @@ try {
         throw new Exception('Помилки валідації');
     }
 
-    // Оновлення паролю та статусу (без перевірки старого пароля)
+    // Читаємо статус (ВИПРАВЛЕНО: тепер читаємо з $_POST['status'])
     $status_map = ['user' => '1', 'admin' => '10', 'editor' => '9', 'viewer' => '8'];
-    $status = $status_map[$_POST['input_status'] ?? 'user'] ?? '1';
-    $new_password = md5($_POST['new_password1']);
+    $status = $status_map[$_POST['status'] ?? 'user'] ?? '1';
 
-    $stmt = $linc->prepare("UPDATE users SET password = ?, status = ? WHERE user_id = ?");
-
-    if (!$stmt) {
-        throw new Exception('Помилка підготовки запиту: ' . $linc->error);
+    if ($is_password_change) {
+        // Якщо є пароль - оновлюємо пароль і статус
+        $new_password = md5($_POST['new_password1']);
+        $stmt = $linc->prepare("UPDATE users SET password = ?, status = ? WHERE user_id = ?");
+        
+        if (!$stmt) throw new Exception('Помилка підготовки запиту: ' . $linc->error);
+        $stmt->bind_param('ssi', $new_password, $status, $user_id);
+    } else {
+        // Якщо пароля немає - оновлюємо тільки статус
+        $stmt = $linc->prepare("UPDATE users SET status = ? WHERE user_id = ?");
+        
+        if (!$stmt) throw new Exception('Помилка підготовки запиту: ' . $linc->error);
+        $stmt->bind_param('si', $status, $user_id);
     }
-
-    $stmt->bind_param('ssi', $new_password, $status, $user_id);
 
     if (!$stmt->execute()) {
         throw new Exception('Помилка при оновленні: ' . $stmt->error);

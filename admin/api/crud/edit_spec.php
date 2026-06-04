@@ -41,11 +41,11 @@ try {
         throw new Exception('Помилка підготовки запиту: ' . $linc->error);
     }
 
-// Оголошуємо змінні
+    // Оголошуємо змінні (Додано захист ?? '' до im_spec)
     $id_galuz = $_POST['id_galuz'] ?? '';
     $im_galuz = $_POST['im_galuz'] ?? '';
     $id_spec = $_POST['id_spec'] ?? '';
-    $im_spec = $_POST['im_spec'];
+    $im_spec = $_POST['im_spec'] ?? '';
     $im_specializ = $_POST['im_specializ'] ?? '';
 
     // Передаємо рівно 6 параметрів (5 рядків 's' та 1 число 'i')
@@ -63,7 +63,7 @@ try {
         throw new Exception('Помилка при оновленні спеціальності: ' . $stmt->error);
     }
 
-    // Fetch updated spec data to return to client
+    // Отримуємо оновлені дані для повернення клієнту
     $selectStmt = $linc->prepare("SELECT * FROM spec WHERE id_sp = ?");
     if (!$selectStmt) {
         throw new Exception('Помилка при отриманні даних: ' . $linc->error);

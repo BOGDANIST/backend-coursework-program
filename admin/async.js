@@ -5,7 +5,7 @@ const API_BASE = 'admin/api/';
 const AsyncRouter = {
     // === FILTER OPERATIONS ===
 
-async filterStudents(formElement = null, page = 1, limit = 50) {
+    async filterStudents(formElement = null, page = 1, limit = 50) {
         try {
             const form = formElement || document.getElementById('filter-form');
             const filters = this.collectFilterData(form);
@@ -16,20 +16,20 @@ async filterStudents(formElement = null, page = 1, limit = 50) {
             if (response.success) {
                 try {
                     // Виправлення 1: console.success не існує, використовуємо console.log
-                    console.log('Дані успішно завантажено'); 
+                    console.log('Дані успішно завантажено');
                 } catch (e) {
                     console.warn('Could not save filters to localStorage:', e);
                 }
-                
+
                 this.renderStudentTable(response.data, false);
                 this.renderPagination(response.page, response.totalPages, 'AsyncRouter.filterStudents');
                 this.saveFiltersToLocalStorage(filters);
-                
+
                 // Виправлення 2: Гарантуємо, що у Toast передається текст (String), 
                 // навіть якщо PHP повернув null або undefined
                 const messageText = response.message ? String(response.message) : 'Дані успішно оновлено';
                 ToastNotification.info(messageText);
-                
+
             } else {
                 const errorText = response.message ? String(response.message) : 'Помилка при пошуку студентів';
                 ToastNotification.error(errorText);
@@ -359,7 +359,7 @@ async filterStudents(formElement = null, page = 1, limit = 50) {
             if (response.success) {
                 ToastNotification.success('Спеціальність успішно додано');
                 formElement.reset();
-                
+
                 // Оновлюємо список ТІЛЬКИ якщо на сторінці є форма фільтрації
                 if (document.getElementById('filter-form')) {
                     this.filterSpecialties();
@@ -464,8 +464,8 @@ async filterStudents(formElement = null, page = 1, limit = 50) {
             ToastNotification.error('Помилка при додаванні користувача');
         }
     },
-    
-async editUser(userId, formElement) {
+
+    async editUser(userId, formElement) {
         try {
             const formData = new FormData(formElement);
             formData.append('user_id', userId);
@@ -474,10 +474,10 @@ async editUser(userId, formElement) {
 
             if (response.success) {
                 ToastNotification.success('Користувача успішно оновлено');
-                
+
                 // ОЧИЩАЄМО ФОРМУ: всі поля, включаючи паролі, стануть порожніми
-                formElement.reset(); 
-                
+                formElement.reset();
+
                 if (window.loadUsersList) window.loadUsersList();
             } else {
                 if (response.errors) {
@@ -712,35 +712,43 @@ async editUser(userId, formElement) {
                 </thead>
                 <tbody>
         `;
-
         students.forEach((student, index) => {
             html += `
                 <tr>
-                    <td  class="text-center">${index + 1}</td>
+                    <td class="text-center">${index + 1}</td>
                     <td>${this.escapeHtml(student.s_pr)}</td>
                     <td>${this.escapeHtml(student.s_im)}</td>
                     <td>${this.escapeHtml(student.s_bat)}</td>
                     <td class="text-center">${this.escapeHtml(student.s_group)}</td>
                     <td class="text-center">${this.escapeHtml(student.s_cours)}</td>
-                    `
+            `;
+
             if (isOld) {
                 html += `
                     <td class="d-flex justify-content-center border-0 gap-2">
-                        <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a></td>
-                    </tr>
-                        `;
+                        <a href="view_old_student.php?id_st=${student.s_id}" class="btn btn-sm btn-info">Перегляд</a>
+                    </td>
+                </tr>
+                `;
             } else {
                 html += `
                     <td class="d-flex justify-content-center border-0 gap-2 ">
-                        <a href="view_student.php?id_st=${student.s_id}" class="fs-4  btn btn-sm btn-info">Перегляд</a>
-                        <a href="edit_student.php?id_st=${student.s_id}" class=" fs-4 btn btn-sm btn-warning">Змінити</a>
-                        <a href="#" onclick="AsyncRouter.deleteOldStudent(${student.s_id}); return false;" class="fs-4 btn btn-sm btn-danger">Видалити</a>
+                        <a href="view_student.php?id_st=${student.s_id}" class="fs-4 btn btn-sm btn-info">Перегляд</a>
+                `;
+
+                // Показуємо кнопки "Змінити" та "Видалити", ТІЛЬКИ якщо користувач НЕ viewer
+                if (window.userRole !== 'viewer') {
+                    html += `
+                        <a href="edit_student.php?id_st=${student.s_id}" class="fs-4 btn btn-sm btn-warning">Змінити</a>
+                        <a href="#" onclick="AsyncRouter.deleteStudent(${student.s_id}); return false;" class="fs-4 btn btn-sm btn-danger">Видалити</a>
+                    `;
+                }
+
+                html += `
                     </td>
-                    </tr>
-                         `;
+                </tr>
+                `;
             }
-
-
         });
 
         html += `
@@ -795,34 +803,50 @@ async editUser(userId, formElement) {
         container.innerHTML = html;
     },
 
-    renderSpecTable(specs) {
+renderSpecTable(specs) {
         const container = document.getElementById('results-table');
         if (!container) return;
 
         let html = `
-            <table class="table table-primary rounded-1 table-striped table-responsive-md">
-                <thead>
+            <table class="table table-primary rounded-1 table-striped table-responsive-md fs-3">
+                <thead class="border-0">
                     <tr>
-                        <th>#</th>
-                        <th>Галузь</th>
-                        <th>Спеціальність</th>
-                        <th>Спеціалізація</th>
-                        <th>Дії</th>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Код</th>
+                        <th class="text-center">Галузь</th>
+                        <th class="text-center">Спеціальність</th>
+                        <th class="text-center">Спеціалізація</th>
+                        <th class="text-center">Дії</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
         specs.forEach((spec, index) => {
+            // Безпечно визначаємо ID: беремо id_sp, а якщо його немає - беремо id_spec
+            const primaryId = spec.id_sp ? spec.id_sp : spec.id_spec;
+
             html += `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-center fw-bold">${this.escapeHtml(spec.id_spec || '')}</td>
                     <td>${this.escapeHtml(spec.im_galuz || '')}</td>
-                    <td>${this.escapeHtml(spec.im_spec)}</td>
+                    <td>${this.escapeHtml(spec.im_spec || '')}</td>
                     <td>${this.escapeHtml(spec.im_specializ || '')}</td>
-                    <td class="d-flex gap-2">
-                        <a href="edit_spec.php?id_sp=${spec.id_sp}" class="btn btn-sm btn-warning">Змінити</a>
-                        <a href="#" onclick="AsyncRouter.deleteSpec(${spec.id_sp}); return false;" class="btn btn-sm btn-danger">Видалити</a>
+                    <td class="d-flex justify-content-center border-0 gap-2">
+            `;
+
+            // Показуємо кнопки "Змінити" та "Видалити", ТІЛЬКИ якщо користувач НЕ viewer
+            if (window.userRole !== 'viewer') {
+                html += `
+                        <a href="edit_spec.php?id_sp=${primaryId}" class="fs-4 btn btn-sm btn-warning">Змінити</a>
+                        <a href="#" onclick="AsyncRouter.deleteSpec('${primaryId}'); return false;" class="fs-4 btn btn-sm btn-danger">Видалити</a>
+                `;
+            } else {
+                html += `<span class="text-muted fs-4">Тільки перегляд</span>`;
+            }
+
+            html += `
                     </td>
                 </tr>
             `;
@@ -902,63 +926,63 @@ async editUser(userId, formElement) {
         return String(text).replace(/[&<>"']/g, m => map[m]);
     },
 
-    async exportStudentsToExcel(formElement = null, page = 1, limit = 50, isOld=false) { // Додано async
-    try {
-        const form = formElement || document.getElementById('filter-form');
-        const filters = this.collectFilterData(form);
+    async exportStudentsToExcel(formElement = null, page = 1, limit = 50, isOld = false) { // Додано async
+        try {
+            const form = formElement || document.getElementById('filter-form');
+            const filters = this.collectFilterData(form);
 
-        console.log('Applying filters:', isOld);
-        
-        // 1. Отримуємо відфільтровані дані студентів
-        let responseData;
-        if (isOld) {
-            responseData = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=all', 'POST', filters);
-        } else {
-            responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
+            console.log('Applying filters:', isOld);
+
+            // 1. Отримуємо відфільтровані дані студентів
+            let responseData;
+            if (isOld) {
+                responseData = await this.sendRequest('filters/filter_old_students.php?page=' + page + '&limit=all', 'POST', filters);
+            } else {
+                responseData = await this.sendRequest('filters/filter_students.php?page=' + page + '&limit=all', 'POST', filters);
+            }
+            // console.log('Data to export:', responseData.data);
+            if (responseData.success && responseData.data && responseData.data.length > 0) {
+
+                // 2. Готуємо дані для PHP
+                const formData = new FormData();
+                formData.append('download_excel', 'yes');
+                formData.append('export_data', JSON.stringify(responseData.data)); // Передаємо самі дані
+
+                // Використовуємо нативний fetch, бо нам потрібен Blob (файл), а не JSON
+                const response = await fetch('api/export/export_excel.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Помилка генерації файлу');
+
+                // 3. Перетворюємо відповідь у файл та завантажуємо
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+
+                // Встановлюємо ім'я файлу (можна й без дати, PHP теж її віддає в заголовках)
+                const dateNow = new Date().toISOString().split('T')[0];
+                a.download = `Звіт_по_студентам_на_${dateNow}.xlsx`;
+
+                document.body.appendChild(a);
+                a.click(); // Імітуємо клік для початку скачування
+
+                // Очищуємо пам'ять
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } else {
+                ToastNotification.error(responseData.message || 'Немає даних для експорту');
+            }
+        } catch (error) {
+            console.error('Export error:', error);
+            ToastNotification.error('Помилка при експорті даних');
         }
-       // console.log('Data to export:', responseData.data);
-        if (responseData.success && responseData.data && responseData.data.length > 0) {
-            
-            // 2. Готуємо дані для PHP
-            const formData = new FormData();
-            formData.append('download_excel', 'yes');
-            formData.append('export_data', JSON.stringify(responseData.data)); // Передаємо самі дані
-
-            // Використовуємо нативний fetch, бо нам потрібен Blob (файл), а не JSON
-            const response = await fetch('api/export/export_excel.php', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) throw new Error('Помилка генерації файлу');
-
-            // 3. Перетворюємо відповідь у файл та завантажуємо
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            
-            // Встановлюємо ім'я файлу (можна й без дати, PHP теж її віддає в заголовках)
-            const dateNow = new Date().toISOString().split('T')[0];
-            a.download = `Звіт_по_студентам_на_${dateNow}.xlsx`;
-            
-            document.body.appendChild(a);
-            a.click(); // Імітуємо клік для початку скачування
-            
-            // Очищуємо пам'ять
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-
-        } else {
-            ToastNotification.error(responseData.message || 'Немає даних для експорту');
-        }
-    } catch (error) {
-        console.error('Export error:', error);
-        ToastNotification.error('Помилка при експорті даних');
     }
-}
 };
 
 // Initialize on DOM ready

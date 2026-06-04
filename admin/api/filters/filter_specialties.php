@@ -68,7 +68,7 @@ try {
         $specs[] = $row;
     }
 
-    $response = new ApiResponse(true, "Знайдено $total спеціальностей");
+    $response = new ApiResponse(true, $specs);
     $response->setData($specs);
     $response->setPagination($total, $page, $limit);
     $response->send();

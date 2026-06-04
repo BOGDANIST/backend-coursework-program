@@ -38,6 +38,10 @@ if (!in_array($_SESSION['auth_user'], ['admin', 'editor', 'viewer'])) {
         <link rel="stylesheet" href="assets/css/toast-notifications.css">
     </head>
 
+    <script>
+    // Передаємо права доступу з PHP-сесії у глобальну змінну JavaScript
+    window.userRole = "<?= $_SESSION['auth_user'] ?? '' ?>";
+</script>
     <div id="body-bg">
         <!-- Header -->
         <div id="header">
